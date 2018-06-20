@@ -1,0 +1,7 @@
+#ignore venv
+./venv/
+#ignore pycache
+./__pycache__/
+./migrations/
+./app.db/
+
