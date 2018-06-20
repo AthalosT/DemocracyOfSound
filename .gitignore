@@ -1,7 +1,10 @@
 #ignore venv
 ./venv/
+
 #ignore pycache
 ./__pycache__/
+
+#ignore database stuff
 ./migrations/
 ./app.db/
 
