@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Room {{ room.roomid }}</h1>
+    <h3>Current Playlist:</h3><br>
+    {% for song in playlist %}
+        {% include '__song.html' %}
+    {% endfor %}
+    <p>Add song stuff here</p>
+    {% for user in room.authorized_users %}
+        <p>User: {{ user }}</p>
+    {% endfor %}
+    {% if room.owner %}
+        <p>Owner: {{ room.owner }}</p>
+    {% endif %}
+{% endblock %}
