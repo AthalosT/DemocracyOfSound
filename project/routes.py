@@ -126,7 +126,7 @@ def findroom():
             return redirect(url_for('roomlogin', roomid=form.roomid.data))
     return render_template('findroom.html', title='Find Room', form=form)
 
-@app.route('/suggestsong/<roomid>', methods=['GET', 'POST'])
+@app.route('/suggest/<roomid>', methods=['GET', 'POST'])
 def suggestsong(roomid):
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
@@ -145,11 +145,11 @@ def suggestsong(roomid):
         suggestions = lookup.suggested_list(input, 5)
         for s in suggestions:
             choices.append("\"" + s.name + "\"" + " by " + s.main_artist())
-        #choices = [input + '1', input + '2', input + '3'] #TODO spotipy method to get choices here
-        #return(url_for('suggestsong'))
+            # Maybe figure out how to add the album cover here
+            # Also can filter by explicit?
     elif form2.submit2.data and form2.validate():
         #TODO add song selected to playlist
         flash("Option " + form2.songs.data + " was chosen.")
         #return redirect(url_for('room', roomid=roomid))
-    return render_template('suggestsong.html', title='Suggest a Song', form1=form1, form2=form2, choices=choices)
+    return render_template('suggest.html', title='Suggest a Song', form1=form1, form2=form2, choices=choices)
 
