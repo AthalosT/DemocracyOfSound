@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for, request
 from project import app, db
 from project.forms import LoginForm, RegistrationForm, PostForm, RoomLoginForm, CreateRoomForm, FindRoomForm, SongQueryForm, SongSelectForm
 from flask_login import current_user, login_user, logout_user, login_required
-from project.models import User, Selection, Room, List
+from project.models import User, Song, Room, List
 from werkzeug.urls import url_parse
 from datetime import datetime
 from project.lookup import lookup

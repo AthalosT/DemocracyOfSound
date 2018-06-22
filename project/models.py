@@ -20,14 +20,14 @@ class User(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-class Selection(db.Model):
+class Song(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40))
     artist = db.Column(db.String(40))
     spotify_url = db.Column(db.String(200))
 
     def __repr__(self):
-        return '<Selection {}>'.format(self.name)
+        return '<Song {}>'.format(self.name)
 
 auth_users = db.Table('auth_users', 
     db.Column('room_id', db.Integer, db.ForeignKey('room.id')),
