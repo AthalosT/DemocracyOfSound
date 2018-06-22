@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Suggest Song</h1>
+    <form action="" method="post" novalidate>
+        {{ form1.hidden_tag() }}
+        <p>
+            {{ form1.userquery.label }}<br>
+            {{ form1.userquery(size=32) }}<br>
+            {% for error in form1.userquery.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </p>
+        <p>{{ form1.submit1() }}</p>
+    </form><br><br>
+    
+    {% if choices[0] %}
+        <form action="" method="post" novalidate>
+            {{ form2.hidden_tag() }}
+            <p>
+                {% for song in form2.songs %}
+                    {% if choices[loop.index0] %} 
+                        <tr>
+                            <td>{{ song }} {{ choices[loop.index0] }} </td><br>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+                {% for error in form2.songs.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>{{ form2.submit2() }}</p>
+        </form>
+    {% endif %}
+            
+{% endblock %}

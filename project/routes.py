@@ -1,10 +1,11 @@
 from flask import render_template, flash, redirect, url_for, request
 from project import app, db
-from project.forms import LoginForm, RegistrationForm, PostForm, RoomForm, CreateRoomForm, FindRoomForm
+from project.forms import LoginForm, RegistrationForm, PostForm, RoomLoginForm, CreateRoomForm, FindRoomForm, SongQueryForm, SongSelectForm
 from flask_login import current_user, login_user, logout_user, login_required
 from project.models import User, Selection, Room, List
 from werkzeug.urls import url_parse
 from datetime import datetime
+import spotipy
 import random
 import string
 
@@ -93,7 +94,7 @@ def room(roomid):
 def roomlogin(roomid):
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
-    form = RoomForm()
+    form = RoomLoginForm()
     room = Room.query.filter_by(roomid=roomid).first()
     if room is None:
         flash('Room does not currently exist.')
@@ -123,4 +124,21 @@ def findroom():
         else:
             return redirect(url_for('roomlogin', roomid=form.roomid.data))
     return render_template('findroom.html', title='Find Room', form=form)
+
+@app.route('/suggestsong/<roomid>', methods=['GET', 'POST'])
+def suggestsong(roomid):
+    if not current_user.is_authenticated:
+        return(url_for('login'))
+    form1 = SongQueryForm()
+    form2 = SongSelectForm()
+    choices = []
+    if form1.submit1.data and form1.validate():
+        input = form1.userquery.data
+        choices = [input + '1', input + '2', input + '3'] #TODO spotipy method to get choices here
+        #return(url_for('suggestsong'))
+    elif form2.submit2.data and form2.validate():
+        #TODO add song selected to playlist
+        flash("Option " + form2.songs.data + " was chosen.")
+        #return redirect(url_for('room', roomid=roomid))
+    return render_template('suggestsong.html', title='Suggest a Song', form1=form1, form2=form2, choices=choices)
 

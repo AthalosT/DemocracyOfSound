@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, RadioField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 from project.models import User, Selection, Room, List
 
@@ -24,7 +24,7 @@ class PostForm(FlaskForm):
     post = TextAreaField('Enter input:', validators=[DataRequired(), Length(min=1, max=140)])
     submit = SubmitField('Submit')
 
-class RoomForm(FlaskForm):
+class RoomLoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Enter')
 
@@ -39,3 +39,11 @@ class FindRoomForm(FlaskForm):
     #password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Find Room')
 
+class SongQueryForm(FlaskForm):
+    userquery = StringField('Song Name', validators=[DataRequired()])
+    #numbershown = StringField('Number of Suggestions', validators=[DataRequired()])
+    submit1 = SubmitField('Find Song')
+
+class SongSelectForm(FlaskForm):
+    songs = RadioField('Select Song', choices=[('1', 'a'), ('2', 'b'), ('3', 'c'), ('4', 'd'), ('5', 'e')])
+    submit2 = SubmitField('Enter')  
