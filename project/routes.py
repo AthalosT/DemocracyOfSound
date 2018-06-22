@@ -5,6 +5,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 from project.models import User, Selection, Room, List
 from werkzeug.urls import url_parse
 from datetime import datetime
+from project.lookup import lookup
 import spotipy
 import random
 import string
@@ -114,7 +115,7 @@ def roomlogin(roomid):
 @app.route('/findroom', methods=['GET', 'POST'])
 def findroom():
     if not current_user.is_authenticated:
-        return(url_for('login'))
+        return redirect(url_for('login'))
     form = FindRoomForm()
     if form.validate_on_submit():
         room = Room.query.filter_by(roomid=form.roomid.data).first()
@@ -128,13 +129,23 @@ def findroom():
 @app.route('/suggestsong/<roomid>', methods=['GET', 'POST'])
 def suggestsong(roomid):
     if not current_user.is_authenticated:
-        return(url_for('login'))
+        return redirect(url_for('login'))
+    room = Room.query.filter_by(roomid=roomid).first()
+    if room is None:
+        #redirect somehwere?
+        return redirect(url_for('createroom'))
+    elif not room.check_user(current_user):
+        return redirect(url_for('roomlogin', roomid=roomid))
+
     form1 = SongQueryForm()
     form2 = SongSelectForm()
     choices = []
     if form1.submit1.data and form1.validate():
         input = form1.userquery.data
-        choices = [input + '1', input + '2', input + '3'] #TODO spotipy method to get choices here
+        suggestions = lookup.suggested_list(input, 5)
+        for s in suggestions:
+            choices.append("\"" + s.name + "\"" + " by " + s.main_artist())
+        #choices = [input + '1', input + '2', input + '3'] #TODO spotipy method to get choices here
         #return(url_for('suggestsong'))
     elif form2.submit2.data and form2.validate():
         #TODO add song selected to playlist
