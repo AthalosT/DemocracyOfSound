@@ -21,7 +21,11 @@
                 {% for song in form2.songs %}
                     {% if choices[loop.index0] %} 
                         <tr>
-                            <td>{{ song }} {{ choices[loop.index0] }} </td><br>
+                            <td>{{ song }} 
+                                <img src="{{ choices[loop.index0].album_cover }}" height="40" width="40"> 
+                                "{{ choices[loop.index0].name }}" 
+                                by {{ choices[loop.index0].main_artist() }} 
+                            </td><br>
                         </tr>
                     {% endif %}
                 {% endfor %}

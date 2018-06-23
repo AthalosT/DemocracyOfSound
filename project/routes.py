@@ -143,8 +143,9 @@ def suggestsong(roomid):
     if form1.submit1.data and form1.validate():
         input = form1.userquery.data
         suggestions = lookup.suggested_list(input, 5)
-        for s in suggestions:
-            choices.append("\"" + s.name + "\"" + " by " + s.main_artist())
+        choices = suggestions
+        #for s in suggestions:
+            #choices.append("\"" + s.name + "\"" + " by " + s.main_artist())
             # Maybe figure out how to add the album cover here
             # Also can filter by explicit?
     elif form2.submit2.data and form2.validate():
