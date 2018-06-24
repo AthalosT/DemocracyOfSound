@@ -60,13 +60,23 @@ def createroom():
     form = CreateRoomForm()
     if form.validate_on_submit():
         roomid = generateRandRoomid()
+
         while(Room.query.filter_by(roomid=roomid).first() is not None):
             roomid = generateRandRoomid()
-        newroom = Room(roomid=roomid, owner_id=current_user.id)
+
+        newroom = Room(roomid=roomid, ownerid=current_user.id)
         db.session.add(newroom)
         newroom.add_user(current_user)
         newroom.set_password(form.password.data)
+        
+        suggest_list = List()
+        gen_list = List()
+        newroom.set_suggest_list(suggest_list)
+        newroom.set_gen_list(gen_list)
+        db.session.add(suggest_list)
+        db.session.add(gen_list)
         db.session.commit()
+
         flash('Room ' + roomid + ' successfully created.')
         return redirect(url_for('room', roomid=roomid))
     return render_template('createroom.html', title='Create Room', form=form)
@@ -82,14 +92,18 @@ def generateRandRoomid():
 def room(roomid):
     if not current_user.is_authenticated:
         return redirect(url_for('login'))
+
     room = Room.query.filter_by(roomid=roomid).first()
+    suggest_list = List.query.filter_by(listid=room.suggest_listid).first().list_songs()
+    gen_list = List.query.filter_by(listid=room.gen_listid).first().list_songs()
+
     if room is None:
         redirect(url_for('createroom'))
     elif not room.check_user(current_user):
          return redirect(url_for('roomlogin', roomid=roomid))
     elif room.check_owner(current_user):
-         return render_template('room.html', room=room) #give owner privileges later
-    return render_template('room.html', room=room)
+         return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list) #give owner privileges later
+    return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list)
 
 @app.route('/roomlogin/<roomid>', methods=['GET', 'POST'])
 def roomlogin(roomid):
@@ -161,10 +175,18 @@ def suggestsong(roomid):
     elif form2.submit2.data:# and form2.validate():
         #TODO better names
         #TODO look into validation
-        selection = form2.choices.data
+        chosen = lookup.get_track(form2.choices.data)
+    
+        db_song = Song.query.filter_by(spotify_url=chosen.spotify_url).first()
+        if db_song == None:
+            db_song = Song(name=chosen.name, artist=chosen.main_artist(), spotify_url=chosen.spotify_url)
+            db.session.add(db_song)
+
+        sug_list = List.query.filter_by(listid=room.suggest_listid).first()
+        sug_list.add_song(db_song)
+        db.session.commit()
         
-        song = lookup.get_track(selection)
-        flash("Song name: " + song.name)
-        
+        flash("Song " + db_song.name + " added.")
+        return redirect(url_for('room', roomid=roomid))
     return render_template('suggest.html', title='Suggest a Song', form1=form1, form2=form2, show=show, album_covers=album_covers)
 

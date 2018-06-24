@@ -28,8 +28,9 @@ auth_users = db.Table('auth_users',
 class Room(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     roomid = db.Column(db.String(10), index=True, unique=True)
-    listid = db.Column(db.Integer)
-    owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    suggest_listid = db.Column(db.String(11))
+    gen_listid = db.Column(db.String(11))
+    ownerid = db.Column(db.Integer, db.ForeignKey('user.id'))
     password_hash = db.Column(db.String(128))
     lastused = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     authorized = db.relationship('User', secondary=auth_users, lazy='dynamic')
@@ -52,7 +53,19 @@ class Room(db.Model):
             auth_users.c.user_id == user.id).count() > 0
 
     def check_owner(self, user):
-        return self.owner_id == user.id
+        return self.ownerid == user.id
+
+    def set_suggest_list(self, list):
+        self.suggest_listid = self.roomid + '1'
+        list.roomid = self.roomid
+        list.listid = self.suggest_listid
+        db.session.commit()
+
+    def set_gen_list(self, list):
+        self.gen_listid = self.roomid + '2'
+        list.roomid = self.roomid
+        list.listid = self.gen_listid
+        db.session.commit()
 
 song_lists = db.Table('song_lists',
     db.Column('list_id', db.Integer, db.ForeignKey('list.id')),
@@ -70,6 +83,7 @@ class Song(db.Model):
 
 class List(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    listid = db.Column(db.String(11))
     room = db.Column(db.Integer, db.ForeignKey('room.id'))
     songs = db.relationship('Song', secondary=song_lists, lazy='dynamic')    
 
@@ -84,8 +98,8 @@ class List(db.Model):
     def list_songs(self):
         #TODO naming
         ret = []
-        for song in songs:
-           ret.append(song.spotify_url)
+        for song in self.songs:
+           ret.append([song.name, song.artist, song.spotify_url])
         return ret 
     
     def __repr__(self):
