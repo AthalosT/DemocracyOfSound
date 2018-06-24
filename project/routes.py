@@ -151,6 +151,7 @@ def suggestsong(roomid):
     elif form2.submit2.data and form2.validate():
         #TODO add song selected to playlist
         flash("Option " + form2.songs.data + " was chosen.")
+        
         #return redirect(url_for('room', roomid=roomid))
     return render_template('suggest.html', title='Suggest a Song', form1=form1, form2=form2, choices=choices)
 
