@@ -4,6 +4,7 @@
 #ignore pycache
 ./__pycache__
 ./project/__pycache__
+./project/lookup/__pycache__
 
 #ignore database stuff
 ./migrations
