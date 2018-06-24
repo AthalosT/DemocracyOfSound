@@ -1,12 +1,12 @@
 #ignore venv
-./venv
+**/venv
 
 #ignore pycache
-./__pycache__
-./project/__pycache__
-./project/lookup/__pycache__
+**/__pycache__
 
 #ignore database stuff
-./migrations
-./app.db
+**/migrations
+**/app.db
 
+#ignore pyc
+*.pyc
