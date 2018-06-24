@@ -6,10 +6,7 @@
     {% for song in playlist %}
         {% include '__song.html' %}
     {% endfor %}
-    <p>Add song stuff here</p>
-    {% for user in room.authorized_users %}
-        <p>User: {{ user }}</p>
-    {% endfor %}
+    <p><a href="{{ url_for('suggestsong', roomid=room.roomid) }}">Suggest a Song</a></p>
     {% if room.owner %}
         <p>Owner: {{ room.owner }}</p>
     {% endif %}
