@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, RadioField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, TextAreaField, RadioField, HiddenField, SelectField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length
 from project.models import User, Song, Room, List
 
@@ -45,5 +45,5 @@ class SongQueryForm(FlaskForm):
     submit1 = SubmitField('Find Song')
 
 class SongSelectForm(FlaskForm):
-    songs = RadioField('Select Song', choices=[('1', 'a'), ('2', 'b'), ('3', 'c'), ('4', 'd'), ('5', 'e')])
+    choices = RadioField('Select Song')
     submit2 = SubmitField('Enter')  

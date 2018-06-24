@@ -13,23 +13,20 @@
         </p>
         <p>{{ form1.submit1() }}</p>
     </form><br><br>
-    
-    {% if choices[0] %}
+   
+    {% if show %}
         <form action="" method="post" novalidate>
             {{ form2.hidden_tag() }}
             <p>
-                {% for song in form2.songs %}
-                    {% if choices[loop.index0] %} 
+                {% for choice in form2.choices %}
                         <tr>
-                            <td>{{ song }} 
-                                <img src="{{ choices[loop.index0].album_cover }}" height="40" width="40"> 
-                                "{{ choices[loop.index0].name }}" 
-                                by {{ choices[loop.index0].main_artist() }} 
+                            <td>{{ choice }}
+                                <img src="{{ album_covers[loop.index0] }}" height="40" width="40">
+                                {{ choice.label }} 
                             </td><br>
                         </tr>
-                    {% endif %}
                 {% endfor %}
-                {% for error in form2.songs.errors %}
+                {% for error in form2.choices.errors %}
                 <span style="color: red;">[{{ error }}]</span>
                 {% endfor %}
             </p>

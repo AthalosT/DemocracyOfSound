@@ -10,4 +10,3 @@ class Selection:
 
     def main_artist(self):
         return self.artists[0]
-

@@ -139,19 +139,32 @@ def suggestsong(roomid):
 
     form1 = SongQueryForm()
     form2 = SongSelectForm()
-    choices = []
+    form2.choices.choices = []
+
+    album_covers = []
+    show = False
+
     if form1.submit1.data and form1.validate():
+        show = True
         input = form1.userquery.data
+
         suggestions = lookup.suggested_list(input, 5)
-        choices = suggestions
-        #for s in suggestions:
-            #choices.append("\"" + s.name + "\"" + " by " + s.main_artist())
-            # Maybe figure out how to add the album cover here
-            # Also can filter by explicit?
-    elif form2.submit2.data and form2.validate():
-        #TODO add song selected to playlist
-        flash("Option " + form2.songs.data + " was chosen.")
         
-        #return redirect(url_for('room', roomid=roomid))
-    return render_template('suggest.html', title='Suggest a Song', form1=form1, form2=form2, choices=choices)
+        songs = []
+        album_covers = []
+        for suggestion in suggestions:
+            songs.append((suggestion.spotify_url, "\"" + suggestion.name + "\" by " + suggestion.main_artist()))
+            album_covers.append(suggestion.album_cover)
+        form2.choices.choices = songs
+        # Also can filter by explicit?
+        flash(len(form2.choices.choices))
+    elif form2.submit2.data:# and form2.validate():
+        #TODO better names
+        #TODO look into validation
+        selection = form2.choices.data
+        
+        song = lookup.get_track(selection)
+        flash("Song name: " + song.name)
+        
+    return render_template('suggest.html', title='Suggest a Song', form1=form1, form2=form2, show=show, album_covers=album_covers)
 

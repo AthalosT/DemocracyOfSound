@@ -61,8 +61,8 @@ song_lists = db.Table('song_lists',
 
 class Song(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(40))
-    artist = db.Column(db.String(40))
+    name = db.Column(db.String(100))
+    artist = db.Column(db.String(100))
     spotify_url = db.Column(db.String(200))
 
     def __repr__(self):

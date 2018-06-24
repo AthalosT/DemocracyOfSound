@@ -24,3 +24,19 @@ def suggested_list(input_str, num_args):
         suggestions.append(temp)
 
     return suggestions
+
+def get_track(input_str):
+
+    client_credentials_manager = SpotifyClientCredentials(client_id=cred.client_id,
+                                                          client_secret=cred.client_secret)
+    sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+    result = sp.track(track_id=input_str)
+
+    artists = []
+    for i in result['artists']:
+        artists.append(i['name'])
+    temp = selection.Selection(name=result['name'], artists=artists, explicit=result['explicit'],
+                                   spotify_url=result['external_urls']['spotify'], 
+                                   preview_url=result['preview_url'], album_cover=result['album']['images'][0]['url'])
+    
+    return temp
