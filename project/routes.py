@@ -171,7 +171,6 @@ def suggestsong(roomid):
             album_covers.append(suggestion.album_cover)
         form2.choices.choices = songs
         # Also can filter by explicit?
-        flash(len(form2.choices.choices))
     elif form2.submit2.data:# and form2.validate():
         #TODO better names
         #TODO look into validation
