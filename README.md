@@ -9,10 +9,9 @@ How to run:
 6. $ pip install flask-sqlalchemy
 7. $ pip install flask-migrate
 8. $ pip install flask-login
-9. $ export FLASK_APP=main.py 
-10. $ flask db init
-11. $ flask db migrate -m "import tables"
-12. $ flask db upgrade
-13. $ flask run
+9. $ pip install flask-socketio
+10. $ pip install socketio
+11. $ ./dbreset.sh
+12. $ flask run
 
 Then go to localhost
