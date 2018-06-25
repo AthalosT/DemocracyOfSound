@@ -45,5 +45,5 @@ class SongQueryForm(FlaskForm):
     submit1 = SubmitField('Find Song')
 
 class SongSelectForm(FlaskForm):
-    choices = RadioField('Select Song')
+    choices = RadioField('Select Song', coerce=str)
     submit2 = SubmitField('Enter')  

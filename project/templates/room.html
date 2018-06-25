@@ -10,7 +10,7 @@
             {% endfor %}
             </ol>
     {% endif %}
-    <p><a href="{{ url_for('suggestsong', roomid=room.roomid) }}">Suggest a Song</a></p>
+    <p><a href="{{ url_for('findsong', roomid=room.roomid) }}">Suggest a Song</a></p>
     {% if room.owner %}
         <p>Owner: {{ room.owner }}</p>
     {% endif %}

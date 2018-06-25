@@ -102,7 +102,8 @@ def room(roomid):
     elif not room.check_user(current_user):
          return redirect(url_for('roomlogin', roomid=roomid))
     elif room.check_owner(current_user):
-         return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list) #give owner privileges later
+         return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list) 
+    #give owner privileges later
     return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list)
 
 @app.route('/roomlogin/<roomid>', methods=['GET', 'POST'])
@@ -141,39 +142,46 @@ def findroom():
     return render_template('findroom.html', title='Find Room', form=form)
 
 @app.route('/suggest/<roomid>', methods=['GET', 'POST'])
-def suggestsong(roomid):
-    if not current_user.is_authenticated:
-        return redirect(url_for('login'))
-    room = Room.query.filter_by(roomid=roomid).first()
-    if room is None:
-        #redirect somehwere?
-        return redirect(url_for('createroom'))
-    elif not room.check_user(current_user):
-        return redirect(url_for('roomlogin', roomid=roomid))
+def findsong(roomid):
+    not_authenticated, ret = check_authenticated(roomid)
+    if not_authenticated:
+        return ret
+
+    form1 = SongQueryForm()
+    show = False
+
+    if form1.submit1.data and form1.validate():
+        return redirect(url_for('selectsong', roomid=roomid, query=form1.userquery.data))
+    
+    return render_template('suggest.html', form1=form1, show=show)
+
+@app.route('/suggest/<roomid>/q=<query>', methods=['GET', 'POST'])
+def selectsong(roomid, query):
+    not_authenticated, ret = check_authenticated(roomid)
+    if not_authenticated:
+        return ret
+    room = ret
 
     form1 = SongQueryForm()
     form2 = SongSelectForm()
     form2.choices.choices = []
 
+    suggestions = lookup.suggested_list(query, 5)
+    form2.choices.choices = []
     album_covers = []
-    show = False
+
+    #TODO right now the site makes a second call to spotipy in order to ensure validation
+    #     maybe it would be better to store all suggestions and repopulate list using stored 
+    #     suggestions in the database. Otherwise make sure to fix this when adding js
+    for i in range(0, len(suggestions)):
+        suggestion = suggestions[i]
+        form2.choices.choices.append((suggestion.spotify_url, "\"" + suggestion.name + "\" by " + suggestion.main_artist()))
+        album_covers.append(suggestion.album_cover)
 
     if form1.submit1.data and form1.validate():
-        show = True
-        input = form1.userquery.data
-
-        suggestions = lookup.suggested_list(input, 5)
-        
-        songs = []
-        album_covers = []
-        for suggestion in suggestions:
-            songs.append((suggestion.spotify_url, "\"" + suggestion.name + "\" by " + suggestion.main_artist()))
-            album_covers.append(suggestion.album_cover)
-        form2.choices.choices = songs
-        # Also can filter by explicit?
-    elif form2.submit2.data:# and form2.validate():
+        return redirect(url_for('selectsong', roomid=roomid, query=form1.userquery.data))
+    elif form2.submit2.data and form2.validate():
         #TODO better names
-        #TODO look into validation
         chosen = lookup.get_track(form2.choices.data)
     
         db_song = Song.query.filter_by(spotify_url=chosen.spotify_url).first()
@@ -187,5 +195,16 @@ def suggestsong(roomid):
         
         flash("Song " + db_song.name + " added.")
         return redirect(url_for('room', roomid=roomid))
-    return render_template('suggest.html', title='Suggest a Song', form1=form1, form2=form2, show=show, album_covers=album_covers)
+ 
+    return render_template('suggest.html', form1=form1, form2=form2, show=True, album_covers=album_covers)
 
+def check_authenticated(roomid):
+    #TODO standardize authentication methods
+    if not current_user.is_authenticated:
+        return (True, redirect(url_for('login')))
+    room = Room.query.filter_by(roomid=roomid).first()
+    if room is None:
+        return (True, redirect(url_for('createroom')))
+    elif not room.check_user(current_user):
+        return (True, redirect(url_for('roomlogin', roomid=roomid)))
+    return (False, room)
