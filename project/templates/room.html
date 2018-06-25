@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Room {{ room.roomid }}</h1>
+    <h1>Room {{ room.room_id }}</h1>
     {% if suggest_list %}
         <h3>Current Playlist:</h3>
             <ol>
@@ -10,8 +10,8 @@
             {% endfor %}
             </ol>
     {% endif %}
-    <p><a href="{{ url_for('findsong', roomid=room.roomid) }}">Suggest a Song</a></p>
-    {% if room.owner %}
-        <p>Owner: {{ room.owner }}</p>
+    <p><a href="{{ url_for('findsong', room_id=room.room_id) }}">Suggest a Song</a></p>
+    {% if room.owner_id %}
+        <p>Owner: {{ room.owner_id }}</p>
     {% endif %}
 {% endblock %}

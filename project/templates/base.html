@@ -11,8 +11,8 @@
             {% if current_user.is_anonymous %}
             <a href="{{ url_for('login') }}">Login</a>
             {% else %}
-            <a href="{{ url_for('createroom') }}">Create Room</a>
-            <a href="{{ url_for('findroom') }}">Find Room</a>
+            <a href="{{ url_for('create_room') }}">Create Room</a>
+            <a href="{{ url_for('find_room') }}">Find Room</a>
             <a href="{{ url_for('logout') }}">Logout</a>
             {% endif %}
         </div>

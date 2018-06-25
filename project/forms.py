@@ -40,8 +40,8 @@ class FindRoomForm(FlaskForm):
     submit = SubmitField('Find Room')
 
 class SongQueryForm(FlaskForm):
-    userquery = StringField('Song Name', validators=[DataRequired()])
-    #numbershown = StringField('Number of Suggestions', validators=[DataRequired()])
+    user_query = StringField('Song Name', validators=[DataRequired()])
+    #number_shown = StringField('Number of Suggestions', validators=[DataRequired()])
     submit1 = SubmitField('Find Song')
 
 class SongSelectForm(FlaskForm):
