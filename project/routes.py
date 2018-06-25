@@ -82,10 +82,7 @@ def createroom():
     return render_template('createroom.html', title='Create Room', form=form)
  
 def generateRandRoomid():
-    roomid = ''
-    for i in range(0, 5):
-        roomid = roomid + random.choice(string.ascii_lowercase)
-    return roomid
+    return ''.join([random.choice(string.ascii_lowercase) for i in range(5)])
 
 @app.route('/room/<roomid>')
 @login_required
