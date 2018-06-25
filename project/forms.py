@@ -35,7 +35,7 @@ class CreateRoomForm(FlaskForm):
 
 # Figure out whether this should route to roomlogin 
 class FindRoomForm(FlaskForm):
-    roomid = StringField('Room Code', validators=[DataRequired()])
+    room_id = StringField('Room Code', validators=[DataRequired()])
     #password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Find Room')
 
