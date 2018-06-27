@@ -182,7 +182,7 @@ def selectsong(room_id, query):
         chosen = lookup.get_track(select_song_form.choices.data)
     
         db_song = Song.query.filter_by(spotify_url=chosen.spotify_url).first()
-        if db_song == None:
+        if db_song is None:
             db_song = Song(name=chosen.name, artist=chosen.main_artist(), spotify_url=chosen.spotify_url)
             db.session.add(db_song)
 

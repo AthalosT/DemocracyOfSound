@@ -7,18 +7,38 @@
 
 			socket.on("song-query-results", function(results) {
 				$("#results").empty();
+                $("#results").append("<br>");
 				for (var i = 0; i < results.length; i++) {
-					$("#results").append("<li>" + "<img src=" + results[i].album_cover + " height=\"40\" width=\"40\"/>" + results[i].name + "</li>");
+                $("#results").append("<input type=\"radio\" name=\"song\" value=\"" + results[i].spotify_url + "\">" + "<img src=" + results[i].album_cover + " height=\"40\" width=\"40\"/>" + results[i].name + "<br>");
 				}
 				$("#results").css("display", "inline");
+                $("#submit").css("display", "inline");
 			});
+
+            socket.on("failed", function(str) {
+                $("#results").append(str);
+                $("#results").append("{{ room.room_id }}");
+                $("#results").css("display", "inline");
+            });
 
 			$("#search-button").on("click", function() {
 				if ($("#search-box").val() != "") {
 					socket.emit("song-query", $("#search-box").val());
-					$("#search-box").val("");
 				}
 			});
+            
+            $("#submit").on("click", function() {
+                selected = document.forms.results.song.value
+                if (selected != null) {
+                    var room_id = $("{{ room.room_id }}");
+                    socket.emit("song-selection", {"spotify_url": selected, 
+                        "room_id": room_id});
+                    // TODO This may be vulnerable to injection attacks
+                    $("#results").empty();
+                    $("#results").css("display", "none");
+                    $("#submit").css("display", "none");
+                }
+            });
 		});
 	</script>
 
@@ -40,6 +60,6 @@
 	<input type="text" id="search-box">
 	<button id="search-button">Search</button>
 
-	<ul id="results"></ul>
+    <form id="results"></form>
 	<button id="submit" style="display:none">Submit</button>
 {% endblock %}
