@@ -10,8 +10,9 @@ How to run:
 7. $ pip install flask-migrate
 8. $ pip install flask-login
 9. $ pip install flask-socketio
-10. $ pip install spotipy
-11. $ ./dbreset.sh
-12. $ flask run
+10. $ pip install flask-script
+11. $ pip install spotipy
+12. $ ./dbreset.sh
+13. $ flask run
 
 Then go to localhost
