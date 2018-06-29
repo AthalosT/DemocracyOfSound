@@ -1,0 +1,14 @@
+[[source]]
+verify_ssl = true
+
+[packages]
+jinja2 = "*"
+flask = "*"
+flask-wtf = "*"
+flask-login = "*"
+flask-migrate = "*"
+flask-sqlalchemy = "*"
+flask-socketio = "*"
+
+[requires]
+python-version = "3.6"
