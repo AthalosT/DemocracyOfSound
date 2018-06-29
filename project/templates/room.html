@@ -25,18 +25,31 @@
 			socket.on("song-query-results", function(results) {
 				$("#results").empty();
                 $("#results").append("<br>");
-				for (var i = 0; i < results.length; i++) {
-                    $("#results").append("<input type=\"radio\" name=\"song\" value=\"" + results[i].spotify_url + "\">" + "<img src=" + results[i].album_cover + " height=\"40\" width=\"40\"/>" + results[i].name + "<br>");
-				}
-				$("#results").css("display", "block");
-                $("#submit").css("display", "inline");
+                if (results.length > 0) {
+				    for (var i = 0; i < results.length; i++) {
+                        $("#results").append("<input type=\"radio\" name=\"song\" value=\"" + results[i].spotify_url + "\">" + "<img src=" + results[i].album_cover + " height=\"40\" width=\"40\"/>" + results[i].name + "<br>");
+				    }
+				    $("#results").css("display", "block");
+                    $("#submit").css("display", "inline");
+                } else {
+                    $("#results").append("No songs were found.");
+                    $("#results").css("display", "block");
+                    $("#submit").css("display", "none");
+                }
 			});
 
             socket.on("failed", function(str) {
+                // Called if back-end failed to add song to room playlist.
                 // TODO message about failing to add to list
                 $("#results").append(str);
-                $("#results").append("{{ room.room_id }}");
                 $("#results").css("display", "block");
+            });
+
+            $("#search-box").keypress(function(e) {
+                var code = e.keyCode || e.which;
+                if (code == 13) {
+                    socket.emit("song-query", $("#search-box").val());
+                }
             });
 
 			$("#search-button").on("click", function() {

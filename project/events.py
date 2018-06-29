@@ -36,6 +36,6 @@ def handle_song_selection(selection_data):
         sug_list.add_song(db_song)
         db.session.commit()
         sug_list_songs = sug_list.list_songs()
-        emit('updated-sug-list', [song for song in sug_list_songs])
+        emit('updated-sug-list', [song for song in sug_list_songs], broadcast=True)
     else:
-        emit('failed', room_id)
+        emit('failed', "Sorry, the song was not added. Please try again.")
