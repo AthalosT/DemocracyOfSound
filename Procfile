@@ -1,4 +1,4 @@
-web: flask run
+web: gunicorn -k eventlet project:app
 init: flask db init
 migrate: flask db migrate
 upgrade: flask db upgrade
