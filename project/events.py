@@ -13,7 +13,7 @@ def updated_playlist(data):
         sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
         sug_list_songs = sug_list.list_songs()
         if len(sug_list_songs) > 0:
-            emit('updated-sug-list', [song for song in sug_list_songs])
+            emit('updated-sug-list', {'room_id':room_id, 'songs':[song for song in sug_list_songs]})
 
 @socketio.on('song-query')
 def handle_song_query(query):
@@ -36,6 +36,6 @@ def handle_song_selection(selection_data):
         sug_list.add_song(db_song)
         db.session.commit()
         sug_list_songs = sug_list.list_songs()
-        emit('updated-sug-list', [song for song in sug_list_songs], broadcast=True)
+        emit('updated-sug-list', {'room_id':room_id, 'songs':[song for song in sug_list_songs]}, broadcast=True)
     else:
         emit('failed', "Sorry, the song was not added. Please try again.")
