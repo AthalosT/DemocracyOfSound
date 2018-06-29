@@ -3,7 +3,7 @@
 {% block content %}
 	<script type="text/javascript">
 		$(document).ready(function() {
-			var socket = io.connect("https://arcane-cliffs-15279.herokuapp.com/:3000");
+			var socket = io.connect("https://arcane-cliffs-15279.herokuapp.com:3000");
 
             socket.on("connect", function() {
                 var room_id = "{{ room.room_id }}";
