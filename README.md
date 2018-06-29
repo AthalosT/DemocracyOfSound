@@ -12,7 +12,8 @@ How to run:
 9. $ pip install flask-socketio
 10. $ pip install flask-script
 11. $ pip install spotipy
-12. $ ./dbreset.sh
-13. $ flask run
+12. $ pip install eventlet
+13. $ ./dbreset.sh
+14. $ flask run
 
 Then go to localhost
