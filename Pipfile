@@ -1,14 +1,43 @@
 [[source]]
 verify_ssl = true
+url = "https://pypi.org/simple"
+name = "pypi"
 
-[packages]
-jinja2 = "*"
-flask = "*"
-flask-wtf = "*"
-flask-login = "*"
-flask-migrate = "*"
-flask-sqlalchemy = "*"
-flask-socketio = "*"
+[dev-packages]
 
 [requires]
-python-version = "3.6"
+python_version = "3.6.6"
+
+[packages]
+alembic = "*"
+certifi = "*"
+chardet = "*"
+click = "*"
+eventlet = "*"
+flask-socketio = "*"
+flask-wtf = "*"
+greenlet = "*"
+gunicorn = "*"
+idna = "*"
+itsdangerous = "*"
+pipenv = "*"
+python-dateutil = "*"
+python-editor = "*"
+python-engineio = "*"
+python-socketio = "*"
+requests = "*"
+six = "*"
+spotipy = "*"
+sqlalchemy = "*"
+"urllib3" = "*"
+virtualenv = "*"
+virtualenv-clone = "*"
+werkzeug = "*"
+Flask = "*"
+Flask-Login = "*"
+Flask-Migrate = "*"
+Flask-SQLAlchemy = "*"
+"Jinja2" = "*"
+Mako = "*"
+MarkupSafe = "*"
+WTForms = "*"
