@@ -5,6 +5,7 @@
 **/__pycache__
 
 #ignore database stuff
+**/migrations
 **/app.db
 
 #ignore pyc
