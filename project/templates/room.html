@@ -5,20 +5,38 @@
 		$(document).ready(function() {
 			var socket = io.connect("http://127.0.0.1:5000");
 
+            socket.on("connect", function() {
+                var room_id = "{{ room.room_id }}";
+                socket.emit("joined", {"room_id": room_id});
+            });
+
+            socket.on("updated-sug-list", function(songs) {
+                $("#title").empty();
+                $("#title").append("<h3>Current Playlist:</h3>");
+                $("#sug-list").empty();
+                for (var i = 0; i < songs.length; i++) {
+                    $("#sug-list").append("<li>\"" + songs[i][0] + "\" by " + songs[i][1] + "</li>");
+                }
+                $("#title").css("display", "inline");
+                $("#sug-list").css("display", "block");
+            });
+
+
 			socket.on("song-query-results", function(results) {
 				$("#results").empty();
                 $("#results").append("<br>");
 				for (var i = 0; i < results.length; i++) {
-                $("#results").append("<input type=\"radio\" name=\"song\" value=\"" + results[i].spotify_url + "\">" + "<img src=" + results[i].album_cover + " height=\"40\" width=\"40\"/>" + results[i].name + "<br>");
+                    $("#results").append("<input type=\"radio\" name=\"song\" value=\"" + results[i].spotify_url + "\">" + "<img src=" + results[i].album_cover + " height=\"40\" width=\"40\"/>" + results[i].name + "<br>");
 				}
-				$("#results").css("display", "inline");
+				$("#results").css("display", "block");
                 $("#submit").css("display", "inline");
 			});
 
             socket.on("failed", function(str) {
+                // TODO message about failing to add to list
                 $("#results").append(str);
                 $("#results").append("{{ room.room_id }}");
-                $("#results").css("display", "inline");
+                $("#results").css("display", "block");
             });
 
 			$("#search-button").on("click", function() {
@@ -30,28 +48,22 @@
             $("#submit").on("click", function() {
                 selected = document.forms.results.song.value
                 if (selected != null) {
-                    var room_id = $("{{ room.room_id }}");
+                    var room_id = "{{ room.room_id }}";
                     socket.emit("song-selection", {"spotify_url": selected, 
                         "room_id": room_id});
                     // TODO This may be vulnerable to injection attacks
                     $("#results").empty();
                     $("#results").css("display", "none");
                     $("#submit").css("display", "none");
+                    $("#search-box").val("")
                 }
             });
 		});
 	</script>
 
     <h1>Room {{ room.room_id }}</h1>
-    {% if suggest_list %}
-        <h3>Current Playlist:</h3>
-            <ol>
-            {% for song in suggest_list %}
-                <li>"{{ song[0] }}" by {{ song[1] }}
-            {% endfor %}
-            </ol>
-    {% endif %}
-    <!--<p><a href="{{ url_for('findsong', room_id=room.room_id) }}">Suggest a Song</a></p>-->
+    <h3 id="title" style="display:none"></h3>
+    <ol id="sug-list" style="display:none"></ol>
     {% if room.owner_id %}
         <p>Owner: {{ room.owner_id }}</p>
     {% endif %}
