@@ -99,9 +99,9 @@ def room(room_id):
     elif not room.check_user(current_user):
          return redirect(url_for('room_login', room_id=room_id))
     elif room.check_owner(current_user):
-         return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list) 
+         return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list, username=current_user.username) 
     #give owner privileges later
-    return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list)
+    return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list, username=current_user.username)
 
 @app.route('/roomlogin/<room_id>', methods=['GET', 'POST'])
 def room_login(room_id):
@@ -133,7 +133,7 @@ def find_room():
         current_room = Room.query.filter_by(room_id=form.room_id.data).first()
         if current_room is None:
             flash('Room not found.')    
-            return redirect(url_for('findroom'))
+            return redirect(url_for('find_room'))
         else:
             return redirect(url_for('room_login', room_id=form.room_id.data))
     return render_template('find-room.html', title='Find Room', form=form)

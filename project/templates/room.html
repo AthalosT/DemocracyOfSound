@@ -5,12 +5,30 @@
 		$(document).ready(function() {
 			var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-            socket.on("connect", function(current_socket) {
+            socket.on("connect", function() {
                 var room_id = "{{ room.room_id }}";
-                socket.emit("join", {"room_id": room_id});
+                var username = "{{ username }}";
+                console.log("Here");
+                console.log(username);
+                socket.emit("join", {"room_id": room_id, "username": username});
             });
 
-            socket.on("updated-sug-list", function(songs) {
+            socket.on("disconnect", function() {
+                var room_id = "{{ room.room_id }}";
+                var username = "{{ username }}";
+                socket.emit("leave", {"room_id": room_id, "username": username});
+            });
+
+            socket.on("update-room-users", function(current_users) {
+                $("#room-users").empty();
+                $("#room-users").append("<tr><td><b>Users:</b></td></tr>");
+                console.log(current_users[0]);
+                for (var i = 0; i < current_users.length; i++) {
+                    $("#room-users").append("<tr><td>" + current_users[i] + "</td></tr>");
+                }
+            });
+
+            socket.on("update-sug-list", function(songs) {
                 $("#title").empty();
                 $("#title").append("<h3>Current Playlist:</h3>");
                 $("#sug-list").empty();
@@ -74,17 +92,28 @@
 		});
 	</script>
 
+    <style>
+    table {
+        border-collapse: collapse;
+        border: 1px solid black;
+    }
+    </style>
+
     <h1>Room {{ room.room_id }}</h1>
+    
+    <font size="18">
+        <table id="room-users" align="right" width="20%" border="1">
+        </table>
+    </font>
+
     <h3 id="title" style="display:none"></h3>
     <ol id="sug-list" style="display:none"></ol>
-    {% if room.owner_id %}
-        <p>Owner: {{ room.owner_id }}</p>
-    {% endif %}
-
-	<br>
+    
+ 	<br>
 	<input type="text" id="search-box">
 	<button id="search-button">Search</button>
 
     <form id="results"></form>
 	<button id="submit" style="display:none">Submit</button>
+
 {% endblock %}

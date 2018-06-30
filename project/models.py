@@ -9,6 +9,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    invisible = db.Column(db.Boolean, default=False)
    
     def __repr__(self):
         return '<User {}>'.format(self.username)
@@ -24,6 +25,11 @@ auth_users = db.Table('auth_users',
     db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
 )
 
+room_users = db.Table('room_users',
+    db.Column('room_id', db.Integer, db.ForeignKey('room.id')),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
+)
+
 class Room(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     room_id = db.Column(db.String(10), index=True, unique=True)
@@ -33,6 +39,7 @@ class Room(db.Model):
     password_hash = db.Column(db.String(128))
     last_used = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     authorized = db.relationship('User', secondary=auth_users, lazy='dynamic')
+    current_users = db.relationship('User', secondary=room_users, lazy='dynamic')
     
     def __repr__(self):
         return '<Room {}>'.format(self.room_id)
@@ -50,6 +57,20 @@ class Room(db.Model):
     def check_user(self, user):
         return self.authorized.filter(
             auth_users.c.user_id == user.id).count() > 0
+
+    def add_current_user(self, user):
+        if self.authorized.filter(room_users.c.user_id == user.id).count() == 0 and not user.invisible:
+            self.current_users.append(user)
+
+    def remove_current_user(self, user):
+        if self.authorized.filter(room_users.c.user_id == user.id).count() > 0:
+            self.current_users.delete(user)
+
+    def list_current_users(self):
+        ret = []
+        for user in self.current_users:
+            ret.append(user.username)
+        return ret
 
     def check_owner(self, user):
         return self.owner_id == user.id
@@ -89,6 +110,9 @@ class List(db.Model):
     def add_song(self, song):
         if not self.check_song(song):
             self.songs.append(song)
+            return True
+        else:
+            return False
 
     def check_song(self, song):
         return self.songs.filter(

@@ -2,24 +2,35 @@ from project import socketio
 from flask_socketio import send, emit, join_room, leave_room
 from project import db
 from project.lookup import lookup
-from project.models import Room, List, Song
+from project.models import User, Room, List, Song
 
 
 @socketio.on('join')
 def updated_playlist(data):
     room_id = str(data['room_id'])
+    username = str(data['username'])
     room = Room.query.filter_by(room_id=room_id).first()
     if room is not None:
         join_room(room_id)
+        room.add_current_user(User.query.filter_by(username=username).first())
+        db.session.commit()
+        emit('update-room-users', room.list_current_users(), room=room_id)
+
         sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
         sug_list_songs = sug_list.list_songs()
         if len(sug_list_songs) > 0:
-            emit('updated-sug-list', [song for song in sug_list_songs])
+            emit('update-sug-list', [song for song in sug_list_songs])
 
 @socketio.on('leave')
 def on_leave(data):
     room_id = str(data['room_id'])
-    leave_room(room_id)
+    username = str(data['username'])
+    room = Room.query.filter_by(room_id=room_id).first()
+    if room is not None:
+        leave_room(room_id)
+        room.remove_current_user(User.query.filter_by(username=username).first())
+        db.session.commit()
+        emit('update-room-users', room.list_current_users(), room=room_id)
 
 @socketio.on('song-query')
 def handle_song_query(query):
@@ -39,9 +50,11 @@ def handle_song_selection(selection_data):
             db.session.add(db_song)
 
         sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
-        sug_list.add_song(db_song)
-        db.session.commit()
-        sug_list_songs = sug_list.list_songs()
-        emit('updated-sug-list', [song for song in sug_list_songs], room=room_id)
+        if not sug_list.add_song(db_song):
+            emit('failed', "The song has already been added to the playlist.")
+        else:
+            db.session.commit()
+            sug_list_songs = sug_list.list_songs()
+            emit('update-sug-list', [song for song in sug_list_songs], room=room_id)
     else:
         emit('failed', "Sorry, the song was not added. Please try again.")
