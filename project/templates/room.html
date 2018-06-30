@@ -5,24 +5,20 @@
 		$(document).ready(function() {
 			var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-            socket.on("connect", function() {
+            socket.on("connect", function(current_socket) {
                 var room_id = "{{ room.room_id }}";
-                socket.emit("joined", {"room_id": room_id});
+                socket.emit("join", {"room_id": room_id});
             });
 
-            socket.on("updated-sug-list", function(data) {
-                var room_id = data["room_id"];
-                if (room_id == "{{ room.room_id }}") {
-                    songs = data["songs"];
-                    $("#title").empty();
-                    $("#title").append("<h3>Current Playlist:</h3>");
-                    $("#sug-list").empty();
-                    for (var i = 0; i < songs.length; i++) {
-                        $("#sug-list").append("<li>\"" + songs[i][0] + "\" by " + songs[i][1] + "</li>");
-                    }
-                    $("#title").css("display", "inline");
-                    $("#sug-list").css("display", "block");
-                    }
+            socket.on("updated-sug-list", function(songs) {
+                $("#title").empty();
+                $("#title").append("<h3>Current Playlist:</h3>");
+                $("#sug-list").empty();
+                for (var i = 0; i < songs.length; i++) {
+                    $("#sug-list").append("<li>\"" + songs[i][0] + "\" by " + songs[i][1] + "</li>");
+                }
+                $("#title").css("display", "inline");
+                $("#sug-list").css("display", "block");
             });
 
 

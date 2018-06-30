@@ -1,19 +1,25 @@
 from project import socketio
-from flask_socketio import send, emit
+from flask_socketio import send, emit, join_room, leave_room
 from project import db
 from project.lookup import lookup
 from project.models import Room, List, Song
 
 
-@socketio.on('joined')
+@socketio.on('join')
 def updated_playlist(data):
     room_id = str(data['room_id'])
     room = Room.query.filter_by(room_id=room_id).first()
     if room is not None:
+        join_room(room_id)
         sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
         sug_list_songs = sug_list.list_songs()
         if len(sug_list_songs) > 0:
-            emit('updated-sug-list', {'room_id':room_id, 'songs':[song for song in sug_list_songs]})
+            emit('updated-sug-list', [song for song in sug_list_songs])
+
+@socketio.on('leave')
+def on_leave(data):
+    room_id = str(data['room_id'])
+    leave_room(room_id)
 
 @socketio.on('song-query')
 def handle_song_query(query):
@@ -36,6 +42,6 @@ def handle_song_selection(selection_data):
         sug_list.add_song(db_song)
         db.session.commit()
         sug_list_songs = sug_list.list_songs()
-        emit('updated-sug-list', {'room_id':room_id, 'songs':[song for song in sug_list_songs]}, broadcast=True)
+        emit('updated-sug-list', [song for song in sug_list_songs], room=room_id)
     else:
         emit('failed', "Sorry, the song was not added. Please try again.")
