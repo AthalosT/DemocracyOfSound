@@ -93,7 +93,7 @@ def room(room_id):
     room = Room.query.filter_by(room_id=room_id).first()
     
     if room is None:
-        redirect(url_for('createroom'))
+        redirect(url_for('create_room'))
     elif not room.check_user(current_user):
          return redirect(url_for('room_login', room_id=room_id))
 
@@ -141,7 +141,7 @@ def find_room():
     return render_template('find-room.html', title='Find Room', form=form)
 
 @app.route('/suggest/<room_id>', methods=['GET', 'POST'])
-def findsong(room_id):
+def find_song(room_id):
     not_authenticated, ret = check_authenticated(room_id)
     if not_authenticated:
         return ret
@@ -150,12 +150,12 @@ def findsong(room_id):
     show = False
 
     if find_song_form.submit1.data and find_song_form.validate():
-        return redirect(url_for('selectsong', room_id=room_id, query=find_song_form.user_query.data))
+        return redirect(url_for('select_song', room_id=room_id, query=find_song_form.user_query.data))
     
     return render_template('suggest.html', find_song_form=find_song_form, show=show)
 
 @app.route('/suggest/<room_id>/q=<query>', methods=['GET', 'POST'])
-def selectsong(room_id, query):
+def select_song(room_id, query):
     not_authenticated, ret = check_authenticated(room_id)
     if not_authenticated:
         return ret
@@ -178,7 +178,7 @@ def selectsong(room_id, query):
         album_covers.append(suggestion.album_cover)
 
     if find_song_form.submit1.data and find_song_form.validate():
-        return redirect(url_for('selectsong', room_id=room_id, query=find_song_form.user_query.data))
+        return redirect(url_for('select_song', room_id=room_id, query=find_song_form.user_query.data))
     elif select_song_form.submit2.data and select_song_form.validate():
         #TODO better names
         chosen = lookup.get_track(select_song_form.choices.data)
@@ -203,7 +203,7 @@ def check_authenticated(room_id):
         return (True, redirect(url_for('login')))
     room = Room.query.filter_by(room_id=room_id).first()
     if room is None:
-        return (True, redirect(url_for('createroom')))
+        return (True, redirect(url_for('create_room')))
     elif not room.check_user(current_user):
         return (True, redirect(url_for('room_login', room_id=room_id)))
     return (False, room)
