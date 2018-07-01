@@ -3,6 +3,7 @@ from flask_socketio import send, emit, join_room, leave_room
 from project import db
 from project.lookup import lookup
 from project.models import User, Room, List, Song
+import threading
 
 
 @socketio.on('join')
@@ -26,11 +27,13 @@ def on_leave(data):
     room_id = str(data['room_id'])
     username = str(data['username'])
     room = Room.query.filter_by(room_id=room_id).first()
+
     if room is not None:
-        leave_room(room_id)
-        room.remove_current_user(User.query.filter_by(username=username).first())
+        user = User.query.filter_by(username=username).first()
+        room.remove_current_user(user)
         db.session.commit()
         emit('update-room-users', room.list_current_users(), room=room_id)
+        leave_room(room_id)
 
 @socketio.on('song-query')
 def handle_song_query(query):

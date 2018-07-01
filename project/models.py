@@ -59,12 +59,12 @@ class Room(db.Model):
             auth_users.c.user_id == user.id).count() > 0
 
     def add_current_user(self, user):
-        if self.authorized.filter(room_users.c.user_id == user.id).count() == 0 and not user.invisible:
+        if self.authorized.filter(room_users.c.user_id == user.id).count() == 0: #and not user.invisible:
             self.current_users.append(user)
 
     def remove_current_user(self, user):
         if self.authorized.filter(room_users.c.user_id == user.id).count() > 0:
-            self.current_users.delete(user)
+            self.current_users.remove(user)
 
     def list_current_users(self):
         ret = []

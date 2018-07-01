@@ -91,14 +91,16 @@ def room(room_id):
         return redirect(url_for('login'))
 
     room = Room.query.filter_by(room_id=room_id).first()
-    suggest_list = List.query.filter_by(list_id=room.suggest_list_id).first().list_songs()
-    gen_list = List.query.filter_by(list_id=room.gen_list_id).first().list_songs()
-
+    
     if room is None:
         redirect(url_for('createroom'))
     elif not room.check_user(current_user):
          return redirect(url_for('room_login', room_id=room_id))
-    elif room.check_owner(current_user):
+
+    suggest_list = List.query.filter_by(list_id=room.suggest_list_id).first().list_songs()
+    gen_list = List.query.filter_by(list_id=room.gen_list_id).first().list_songs()
+
+    if room.check_owner(current_user):
          return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list, username=current_user.username) 
     #give owner privileges later
     return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list, username=current_user.username)

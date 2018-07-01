@@ -4,16 +4,16 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			var socket = io.connect('http://' + document.domain + ':' + location.port);
-
+            
             socket.on("connect", function() {
                 var room_id = "{{ room.room_id }}";
                 var username = "{{ username }}";
-                console.log("Here");
                 console.log(username);
                 socket.emit("join", {"room_id": room_id, "username": username});
             });
 
             socket.on("disconnect", function() {
+                console.log("disconnecting");
                 var room_id = "{{ room.room_id }}";
                 var username = "{{ username }}";
                 socket.emit("leave", {"room_id": room_id, "username": username});
@@ -22,7 +22,7 @@
             socket.on("update-room-users", function(current_users) {
                 $("#room-users").empty();
                 $("#room-users").append("<tr><td><b>Users:</b></td></tr>");
-                console.log(current_users[0]);
+                console.log(current_users.length)
                 for (var i = 0; i < current_users.length; i++) {
                     $("#room-users").append("<tr><td>" + current_users[i] + "</td></tr>");
                 }
@@ -59,6 +59,7 @@
             socket.on("failed", function(str) {
                 // Called if back-end failed to add song to room playlist.
                 // TODO message about failing to add to list
+                console.log(str);
                 $("#results").append(str);
                 $("#results").css("display", "block");
             });
