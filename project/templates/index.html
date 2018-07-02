@@ -6,11 +6,7 @@
     <form action="" method="post">
         {{ form.hidden_tag() }}
         <p>
-            {{ form.post.label }}<br>
-            {{ form.post(cols=32, rows=4) }}<br>
-            {% for error in form.post.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-            {% endfor %}
+            We have reset the database, so previously created user accounts and rooms have been deleted. 
         </p>
         <p>{{ form.submit() }}</p>
     </form>

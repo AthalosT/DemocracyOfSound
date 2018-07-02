@@ -40,8 +40,10 @@ def on_disconnect():
         leave_room(room_id)
 
 @socketio.on('song-query')
-def handle_song_query(query):
-    suggestions = lookup.suggested_list(query, 5)
+def handle_song_query(data):
+    query = str(data['query'])
+    num_selections = int(data['num_selections'])
+    suggestions = lookup.suggested_list(query, num_selections)
     emit('song-query-results', [vars(suggestion) for suggestion in suggestions])
 
 @socketio.on('song-selection')

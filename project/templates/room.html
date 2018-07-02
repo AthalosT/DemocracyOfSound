@@ -60,13 +60,13 @@
             $("#search-box").keypress(function(e) {
                 var code = e.keyCode || e.which;
                 if (code == 13) {
-                    socket.emit("song-query", $("#search-box").val());
+                    $("#search-button").click()
                 }
             });
 
 			$("#search-button").on("click", function() {
 				if ($("#search-box").val() != "") {
-					socket.emit("song-query", $("#search-box").val());
+                    socket.emit("song-query", {"query": $("#search-box").val(), "num_selections": $("#num-selections").val()});
 				}
 			});
             
@@ -76,7 +76,6 @@
                     var room_id = "{{ room.room_id }}";
                     socket.emit("song-selection", {"spotify_url": selected, 
                         "room_id": room_id});
-                    // TODO This may be vulnerable to injection attacks
                     $("#results").empty();
                     $("#results").css("display", "none");
                     $("#submit").css("display", "none");
@@ -111,6 +110,15 @@
  	<br>
     <h3>Suggest a Song:</h3>
 	<input type="text" id="search-box">
+    <select id="num-selections">
+        {% for i in range(1, 11) %}
+            {% if i == 5 %}
+                <option value=5 selected="selected">5</option> 
+            {% else %}
+                <option value={{ i }}>{{ i }}</option>
+            {% endif %}
+        {% endfor %}
+    </select>
 	<button id="search-button">Search</button>
 
     <form id="results"></form>

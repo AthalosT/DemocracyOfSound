@@ -43,7 +43,7 @@ class FindRoomForm(FlaskForm):
 class SongQueryForm(FlaskForm):
     user_query = StringField('Song Name', validators=[DataRequired()])
     #TODO needs work
-    #number_shown = SelectField('Number of Suggestions', validators=[DataRequired()])
+    #number_shown = SelectField('Number of Suggestions', choices=[i for i in range(0, 10)], validators=[DataRequired()])
     submit1 = SubmitField('Find Song')
 
 class SongSelectForm(FlaskForm):
