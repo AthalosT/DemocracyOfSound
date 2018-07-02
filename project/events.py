@@ -6,8 +6,14 @@ from project.models import User, Room, List, Song
 import threading
 
 
+room_id = ""
+username = ""
+
 @socketio.on('join')
 def updated_playlist(data):
+    global room_id
+    global username
+
     room_id = str(data['room_id'])
     username = str(data['username'])
     room = Room.query.filter_by(room_id=room_id).first()
@@ -22,10 +28,8 @@ def updated_playlist(data):
         if len(sug_list_songs) > 0:
             emit('update-sug-list', [song for song in sug_list_songs])
 
-@socketio.on('leave')
-def on_leave(data):
-    room_id = str(data['room_id'])
-    username = str(data['username'])
+@socketio.on('disconnect')
+def on_disconnect():
     room = Room.query.filter_by(room_id=room_id).first()
 
     if room is not None:
@@ -43,7 +47,7 @@ def handle_song_query(query):
 @socketio.on('song-selection')
 def handle_song_selection(selection_data):
     spotify_url = selection_data['spotify_url']
-    room_id = selection_data['room_id']
+    #room_id = selection_data['room_id']
     room = Room.query.filter_by(room_id=room_id).first()
     if room is not None:
         chosen = lookup.get_track(spotify_url)

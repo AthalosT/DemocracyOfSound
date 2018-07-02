@@ -12,13 +12,6 @@
                 socket.emit("join", {"room_id": room_id, "username": username});
             });
 
-            socket.on("disconnect", function() {
-                console.log("disconnecting");
-                var room_id = "{{ room.room_id }}";
-                var username = "{{ username }}";
-                socket.emit("leave", {"room_id": room_id, "username": username});
-            });
-
             socket.on("update-room-users", function(current_users) {
                 $("#room-users").empty();
                 $("#room-users").append("<tr><td><b>Users:</b></td></tr>");
