@@ -102,10 +102,7 @@ def room(room_id):
     suggest_list = List.query.filter_by(list_id=room.suggest_list_id).first().list_songs()
     gen_list = List.query.filter_by(list_id=room.gen_list_id).first().list_songs()
 
-    if room.check_owner(current_user):
-         return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list, username=current_user.username) 
-    #give owner privileges later
-    return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list, username=current_user.username)
+    return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list, username=current_user.username, is_owner=room.check_owner(current_user)) 
 
 @app.route('/roomlogin/<room_id>', methods=['GET', 'POST'])
 def room_login(room_id):

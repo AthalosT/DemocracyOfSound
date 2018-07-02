@@ -22,6 +22,8 @@
                 console.log(current_users.length)
                 for (var i = 0; i < current_users.length; i++) {
                     $("#room-users").append("<tr><td>" + current_users[i] + "</td></tr>");
+                    // Fix visual and spacing issues later.
+                    //$("#tabbing").append("<br>");
                 }
             });
 
@@ -108,48 +110,78 @@
 
     <style>
     table {
+        align: right;
         border-collapse: collapse;
         border: 1px solid black;
     }
+    
+    section {
+        float: left;
+        margin: auto;
+        width: 25%;
+    }
+
+    article {
+        float: left;
+        margin: auto;
+        width: 50%;
+    }
+
+    aside {
+        float: right;
+        margin: auto;
+        width: 25%;
+    }
     </style>
 
-    {% if room.room_name %}
-        <h1>{{ room.room_name }} </h1>
-        <p>Room code: {{ room.room_id }}</p>
-    {% else %}
-        <h1>Room {{ room.room_id }}</h1>
-    {% endif %}
-    
+    <section>
+        {% if room.room_name %}
+            <h1>{{ room.room_name }}<br> </h1>
+            <p>Room code: {{ room.room_id }}</p>
+        {% else %}
+            <h1>Room {{ room.room_id }}</h1>
+        {% endif %}
+
+        <h3 id="title" style="display:none"></h3>
+        <ol id="sug-list" style="display:none"></ol>
+
+        <h3>Suggest a Song:</h3>
+	    <input type="text" id="search-box">
+        <select id="num-selections">
+            {% for i in range(1, 11) %}
+                {% if i == 5 %}
+                    <option value=5 selected="selected">5</option> 
+                {% else %}
+                    <option value={{ i }}>{{ i }}</option>
+                {% endif %}
+            {% endfor %}
+        </select>
+	    <button id="search-button">Search</button>
+
+        <form id="results"></form>
+	    <button id="submit" style="display:none">Submit</button>
+
+        {% if is_owner %}
+            <br>
+            <button id="begin-voting">Begin Voting</button>
+            <button id="second-button">Second Button</button>
+        {% endif %}
+    </section>
+
+    <article>
+    </article>
+
+    <aside>
     <font size="18">
-        <table id="room-users" align="right" width="20%" border="1">
-        </table>
+        <table id="room-users" style="width:70%;" border="1"></table>
     </font>
 
-    <h3 id="title" style="display:none"></h3>
-    <ol id="sug-list" style="display:none"></ol>
-    
- 	<br>
-    <h3>Suggest a Song:</h3>
-	<input type="text" id="search-box">
-    <select id="num-selections">
-        {% for i in range(1, 11) %}
-            {% if i == 5 %}
-                <option value=5 selected="selected">5</option> 
-            {% else %}
-                <option value={{ i }}>{{ i }}</option>
-            {% endif %}
-        {% endfor %}
-    </select>
-	<button id="search-button">Search</button>
-
-    <form id="results"></form>
-	<button id="submit" style="display:none">Submit</button>
-	<br>
-	<div id="chat-box" style="background-color:lightblue; transparency:40%; margin:auto; height:240px; width:400px;">
-		<ul id="messages-list" style="overflow-y:auto; height:200px; width:370px; list-style-type: none;">
-		</ul>
+    <br>
+	<div id="chat-box" style="background-color:lightblue; align:left; transparency:40%; height:220px; width:100%; float:right; border:1px solid black;">
+		<ul id="messages-list" style="overflow-y:auto; height:200px; width:95%px; list-style-type:none; padding-left:5;"></ul>
 		<input id="message-box" style="align:center;" placeholder="Enter message">
 		<button id="send-message" style="align:center;">Send</button>
 	</div>
+    </aside>
 
 {% endblock %}
