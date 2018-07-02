@@ -4,13 +4,17 @@
 	<script type="text/javascript">
 		$(document).ready(function() {
 			var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
+			var room_id = "{{ room.room_id }}";
+			var username = "{{ username }}";
             
             socket.on("connect", function() {
-                var room_id = "{{ room.room_id }}";
-                var username = "{{ username }}";
                 console.log(username);
                 socket.emit("join", {"room_id": room_id, "username": username});
             });
+
+			$(window).bind("beforeunload", function() {
+				socket.emit("leave", {"room_id": room_id, "username": username});
+			});
 
             socket.on("update-room-users", function(current_users) {
                 $("#room-users").empty();
@@ -63,6 +67,23 @@
                     $("#search-button").click()
                 }
             });
+
+			$("#message-box").keypress(function(e) {
+				var code = e.keyCode || e.which;
+				if (code == 13 && $("#message-box").val() !== "") {
+					$("#send-message").click();
+					$("#message-box").val('');
+				}
+			});
+
+			$("#send-message").on("click", function() {
+				socket.emit("chat-message", {"msg": $("#message-box").val(), "username": username, "room_id": room_id});
+			});
+
+			socket.on("chat-message", function(msg) {
+				$("#messages-list").append("<li>" + msg + "</li>");
+				console.log("Received message");
+			});
 
 			$("#search-button").on("click", function() {
 				if ($("#search-box").val() != "") {
@@ -123,5 +144,12 @@
 
     <form id="results"></form>
 	<button id="submit" style="display:none">Submit</button>
+	<br>
+	<div id="chat-box" style="background-color:lightblue; transparency:40%; margin:auto; height:240px; width:400px;">
+		<ul id="messages-list" style="overflow-y:auto; height:200px; width:370px; list-style-type: none;">
+		</ul>
+		<input id="message-box" style="align:center;" placeholder="Enter message">
+		<button id="send-message" style="align:center;">Send</button>
+	</div>
 
 {% endblock %}

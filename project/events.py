@@ -1,43 +1,41 @@
 from project import socketio
+from flask import session
 from flask_socketio import send, emit, join_room, leave_room
 from project import db
 from project.lookup import lookup
 from project.models import User, Room, List, Song
 import threading
 
-
-room_id = ""
-username = ""
-
 @socketio.on('join')
 def updated_playlist(data):
-    global room_id
-    global username
-
-    room_id = str(data['room_id'])
-    username = str(data['username'])
+    room_id = data['room_id']
+    username = data['username']
     room = Room.query.filter_by(room_id=room_id).first()
     if room is not None:
         join_room(room_id)
+        print(username + ' joined ' + room_id)
         room.add_current_user(User.query.filter_by(username=username).first())
         db.session.commit()
         emit('update-room-users', room.list_current_users(), room=room_id)
 
         sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
         sug_list_songs = sug_list.list_songs()
-        if len(sug_list_songs) > 0:
+        if sug_list_songs:
             emit('update-sug-list', [song for song in sug_list_songs])
 
-@socketio.on('disconnect')
-def on_disconnect():
+@socketio.on('leave')
+def on_leave(data):
+    room_id = data['room_id']
+    username = data['username']
     room = Room.query.filter_by(room_id=room_id).first()
 
     if room is not None:
+        leave_room(room_id)
+        print(username + ' left ' + room_id)
         user = User.query.filter_by(username=username).first()
         room.remove_current_user(user)
         db.session.commit()
         emit('update-room-users', room.list_current_users(), room=room_id)
-        leave_room(room_id)
 
 @socketio.on('song-query')
 def handle_song_query(data):
@@ -67,3 +65,10 @@ def handle_song_selection(selection_data):
             emit('update-sug-list', [song for song in sug_list_songs], room=room_id)
     else:
         emit('failed', "Sorry, the song was not added. Please try again.")
+
+@socketio.on('chat-message')
+def handle_chat_message(data, namespace='/chat'):
+    msg = data['msg']
+    room_id = data['room_id']
+    username = data['username']
+    emit('chat-message', username + ': ' + msg, room=room_id)
