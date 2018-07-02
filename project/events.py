@@ -47,7 +47,7 @@ def handle_song_query(data):
 @socketio.on('song-selection')
 def handle_song_selection(selection_data):
     spotify_url = selection_data['spotify_url']
-    #room_id = selection_data['room_id']
+    room_id = selection_data['room_id']
     room = Room.query.filter_by(room_id=room_id).first()
     if room is not None:
         chosen = lookup.get_track(spotify_url)
