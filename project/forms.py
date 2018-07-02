@@ -29,6 +29,7 @@ class RoomLoginForm(FlaskForm):
     submit = SubmitField('Enter')
 
 class CreateRoomForm(FlaskForm):
+    room_name = StringField('Room Name', validators=[DataRequired(), Length(max=30)])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Create Room')
@@ -41,7 +42,8 @@ class FindRoomForm(FlaskForm):
 
 class SongQueryForm(FlaskForm):
     user_query = StringField('Song Name', validators=[DataRequired()])
-    #number_shown = StringField('Number of Suggestions', validators=[DataRequired()])
+    #TODO needs work
+    #number_shown = SelectField('Number of Suggestions', validators=[DataRequired()])
     submit1 = SubmitField('Find Song')
 
 class SongSelectForm(FlaskForm):

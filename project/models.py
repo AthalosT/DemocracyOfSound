@@ -32,6 +32,7 @@ room_users = db.Table('room_users',
 
 class Room(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    room_name = db.Column(db.String(30), default="")
     room_id = db.Column(db.String(10), index=True, unique=True)
     suggest_list_id = db.Column(db.String(11))
     gen_list_id = db.Column(db.String(11))

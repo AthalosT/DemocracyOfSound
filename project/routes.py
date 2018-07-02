@@ -64,7 +64,7 @@ def create_room():
         while(Room.query.filter_by(room_id=room_id).first() is not None):
             room_id = generateRandRoomid()
 
-        new_room = Room(room_id=room_id, owner_id=current_user.id)
+        new_room = Room(room_id=room_id, owner_id=current_user.id, room_name=form.room_name.data)
         db.session.add(new_room)
         new_room.add_user(current_user)
         new_room.set_password(form.password.data)
@@ -79,6 +79,8 @@ def create_room():
 
         flash('Room ' + room_id + ' successfully created.')
         return redirect(url_for('room', room_id=room_id))
+    else:
+        form.room_name.data = current_user.username + "'s Room"
     return render_template('create-room.html', title='Create Room', form=form)
  
 def generateRandRoomid():
@@ -93,7 +95,7 @@ def room(room_id):
     room = Room.query.filter_by(room_id=room_id).first()
     
     if room is None:
-        redirect(url_for('create_room'))
+        return redirect(url_for('create_room'))
     elif not room.check_user(current_user):
          return redirect(url_for('room_login', room_id=room_id))
 
@@ -124,7 +126,7 @@ def room_login(room_id):
             current_room.add_user(current_user)
             db.session.commit()
             return redirect(url_for('room', room_id=room_id))
-    return render_template('room-login.html', title="Login to Room " + room_id, form=form)
+    return render_template('room-login.html', title="Login to Room " + room_id, form=form, room_id = room_id)
 
 @app.route('/findroom', methods=['GET', 'POST'])
 def find_room():

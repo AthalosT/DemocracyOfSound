@@ -93,7 +93,12 @@
     }
     </style>
 
-    <h1>Room {{ room.room_id }}</h1>
+    {% if room.room_name %}
+        <h1>{{ room.room_name }} </h1>
+        <p>Room code: {{ room.room_id }}</p>
+    {% else %}
+        <h1>Room {{ room.room_id }}</h1>
+    {% endif %}
     
     <font size="18">
         <table id="room-users" align="right" width="20%" border="1">
@@ -104,6 +109,7 @@
     <ol id="sug-list" style="display:none"></ol>
     
  	<br>
+    <h3>Suggest a Song:</h3>
 	<input type="text" id="search-box">
 	<button id="search-button">Search</button>
 
