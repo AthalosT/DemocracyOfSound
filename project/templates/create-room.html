@@ -25,6 +25,7 @@
              <span style="color: red;">[{{ error }}]</span>
              {% endfor %}
         </p>
+        <p>{{ form.password_required() }} {{form.password_required.label }}</p>
         <p>{{ form.submit() }}</p> 
     </form>
 {% endblock %}

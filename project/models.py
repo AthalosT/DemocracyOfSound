@@ -37,6 +37,7 @@ class Room(db.Model):
     suggest_list_id = db.Column(db.String(11))
     gen_list_id = db.Column(db.String(11))
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    password_required = db.Column(db.Boolean(), default=True)
     password_hash = db.Column(db.String(128))
     last_used = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     authorized = db.relationship('User', secondary=auth_users, lazy='dynamic')

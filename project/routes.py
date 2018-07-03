@@ -64,10 +64,11 @@ def create_room():
         while(Room.query.filter_by(room_id=room_id).first() is not None):
             room_id = generateRandRoomid()
 
-        new_room = Room(room_id=room_id, owner_id=current_user.id, room_name=form.room_name.data)
+        new_room = Room(room_id=room_id, owner_id=current_user.id, room_name=form.room_name.data, password_required=form.password_required.data)
         db.session.add(new_room)
         new_room.add_user(current_user)
-        new_room.set_password(form.password.data)
+        if form.password_required.data:
+            new_room.set_password(form.password.data)
         
         suggest_list = List()
         gen_list = List()
@@ -96,7 +97,7 @@ def room(room_id):
     
     if room is None:
         return redirect(url_for('create_room'))
-    elif not room.check_user(current_user):
+    elif not room.check_user(current_user) and room.password_required:
          return redirect(url_for('room_login', room_id=room_id))
 
     suggest_list = List.query.filter_by(list_id=room.suggest_list_id).first().list_songs()
@@ -113,6 +114,8 @@ def room_login(room_id):
     if room is None:
         flash('Room does not currently exist.')
         return redirect(url_for('room_login', room_id=room_id))
+    elif not current_room.password_required:
+        return redirect(url_for('room', room_id=room_id))
     elif current_room.check_user(current_user):
         return redirect(url_for('room', room_id=room_id))
     elif form.validate_on_submit():
@@ -135,7 +138,7 @@ def find_room():
         if current_room is None:
             flash('Room not found.')    
             return redirect(url_for('find_room'))
-        else:
+        elif current_room.password_required:
             return redirect(url_for('room_login', room_id=form.room_id.data))
     return render_template('find-room.html', title='Find Room', form=form)
 

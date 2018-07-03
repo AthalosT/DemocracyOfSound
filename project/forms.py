@@ -30,9 +30,21 @@ class RoomLoginForm(FlaskForm):
 
 class CreateRoomForm(FlaskForm):
     room_name = StringField('Room Name', validators=[DataRequired(), Length(max=30)])
-    password = PasswordField('Password', validators=[DataRequired()])
-    password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    password = PasswordField('Password', validators=[])
+    password2 = PasswordField('Repeat Password', validators=[EqualTo('password')])
+    password_required = BooleanField('Password Required', default=True)
     submit = SubmitField('Create Room')
+
+    def validate(self):
+        if not FlaskForm.validate(self):
+            return False
+        if self.password_required.data and self.password.data == '':
+            return False
+        return True
+
+    def validate_password(self, password):
+        if self.password_required.data and self.password.data == '':
+            raise ValidationError('Please enter a password.')
 
 # Figure out whether this should route to roomlogin 
 class FindRoomForm(FlaskForm):
