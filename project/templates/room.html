@@ -8,7 +8,6 @@
 			var username = "{{ username }}";
             
             socket.on("connect", function() {
-                console.log(username);
                 socket.emit("join", {"room_id": room_id, "username": username});
             });
 
@@ -19,7 +18,7 @@
             socket.on("update-room-users", function(current_users) {
                 $("#room-users").empty();
                 $("#room-users").append("<tr><td><b>Users:</b></td></tr>");
-                console.log(current_users.length)
+                
                 for (var i = 0; i < current_users.length; i++) {
                     $("#room-users").append("<tr><td>" + current_users[i] + "</td></tr>");
                     // Fix visual and spacing issues later.
@@ -37,7 +36,6 @@
                 $("#title").css("display", "inline");
                 $("#sug-list").css("display", "block");
             });
-
 
 			socket.on("song-query-results", function(results) {
 				$("#results").empty();
@@ -58,7 +56,6 @@
             socket.on("failed", function(str) {
                 // Called if back-end failed to add song to room playlist.
                 // TODO message about failing to add to list
-                console.log(str);
                 $("#results").append(str);
                 $("#results").css("display", "block");
             });
@@ -158,11 +155,11 @@
         </select>
 	    <button id="search-button">Search</button>
 
-        <form id="results"></form>
+        <form id="results" style="display:none"></form>
 	    <button id="submit" style="display:none">Submit</button>
 
         {% if is_owner %}
-            <br>
+            <p></p>
             <button id="begin-voting">Begin Voting</button>
             <button id="second-button">Second Button</button>
         {% endif %}
@@ -176,7 +173,7 @@
         <table id="room-users" style="width:70%;" border="1"></table>
     </font>
 
-    <br>
+    <p></p>
 	<div id="chat-box" style="background-color:lightblue; align:left; transparency:40%; height:220px; width:100%; float:right; border:1px solid black;">
 		<ul id="messages-list" style="overflow-y:auto; height:200px; width:95%px; list-style-type:none; padding-left:5;"></ul>
 		<input id="message-box" style="align:center;" placeholder="Enter message">

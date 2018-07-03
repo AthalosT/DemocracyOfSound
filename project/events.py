@@ -13,7 +13,6 @@ def updated_playlist(data):
     room = Room.query.filter_by(room_id=room_id).first()
     if room is not None:
         join_room(room_id)
-        print(username + ' joined ' + room_id)
         room.add_current_user(User.query.filter_by(username=username).first())
         db.session.commit()
         emit('update-room-users', room.list_current_users(), room=room_id)
@@ -31,7 +30,6 @@ def on_leave(data):
 
     if room is not None:
         leave_room(room_id)
-        print(username + ' left ' + room_id)
         user = User.query.filter_by(username=username).first()
         room.remove_current_user(user)
         db.session.commit()
