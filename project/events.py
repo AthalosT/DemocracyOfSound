@@ -74,7 +74,7 @@ def handle_begin_voting(room_id):
         emit('display-vote-songs', sug_list_songs, room=room_id)
 
 @socketio.on('finish-voting')
-def handle_finish_boting(data):
+def handle_finish_voting(data):
     room_id = data['room_id']
     username = data['username']
     votes = data['votes']
@@ -86,6 +86,23 @@ def handle_finish_boting(data):
             num_vote = votes[key]
             vote = sug_list.vote_song(spotify_url=key, votes=num_vote)
             db.session.commit()
+
+@socketio.on('collect-votes')
+def handle_collect_votes(room_id):
+    emit('submit-votes', room=room_id)
+
+@socketio.on('end-voting')
+def handle_end_voting(room_id):
+    room = Room.query.filter_by(room_id=room_id).first()
+    
+    if room is not None:
+        sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
+        sug_list_votes = sug_list.list_votes()
+        vote_display = []
+        for vote in sug_list_votes:
+            song = lookup.get_track(vote[0])
+            vote_display.append(song.name + " " + song.main_artist() + "\t" + str(vote[1]))
+        emit('display-votes', vote_display, room=room_id)
 
 @socketio.on('chat-message')
 def handle_chat_message(data, namespace='/chat'):

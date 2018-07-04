@@ -65,14 +65,22 @@
             socket.on("display-vote-songs", function(songs) {
                 vote_songs = songs;
                 votes = {};
-                $("#song-vote").empty()
-                for (var i = 0; i < 4; i++) {
-                    song = vote_songs.pop();
-                    console.log(song);
-                    $("#song-vote").append("<button class=\"song-button\" type=\"button\" value=\"" + song[3] +"\" type=\"submit\"> <img src=" + song[2] + " height=\"60\" width=\"60\" style=\"float:left;\"><div style=\"float:right\">" + song[0] + "</div></button>");
-                }
+                showNextChoices();
                 $("#song-vote").css("display", "block");
                 $("#prompt").css("display", "block");
+            });
+
+            socket.on("submit-votes", function() {
+                $("#song-vote").empty();
+                submitVotes();
+            });
+
+            socket.on("display-votes", function(vote_display) {
+                $("#vote-display").empty();
+                for (var i = 0; i < vote_display.length; i++) {
+                    $("#vote-display").append("<li>" + vote_display[i] + "</li>");
+                }
+                $("#vote-display").css("display", "block");
             });
 
             $("#search-box").keypress(function(e) {
@@ -123,9 +131,12 @@
             });
 
             $("#end-voting").on("click", function() {
-                socket.emit("end-voting", room_id);
+                socket.emit("collect-votes", room_id);
                 $("#end-voting").css("display", "none");
                 $("#begin-voting").css("display", "block");
+                setTimeout(function() {
+                    socket.emit("end-voting", room_id);
+                });
             });
 
             $(document).on("click", ".song-button", function(e) {
@@ -138,16 +149,25 @@
                 }
 
                 if (vote_songs.length > 3) {
-                    $("#song-vote").empty()
-                    for (var i = 0; i < 4; i++) {
-                        song = vote_songs.pop();
-                        $("#song-vote").append("<button class=\"song-button\" name=\"vote\" value=\"" + song.spotify_url +"\" type=\"submit\"> <img src=" + song.album_cover + " height=\"60\" width=\"60\"/>   " + song.name + "</button>");
-                    }
+                    showNextChoices();
                 } else{
-                    $("#song-vote").css("display", "none");
-                    socket.emit("finish-voting", {"votes": votes, "username": username, "room_id": room_id});
+                    submitVotes();
                 }
            });
+
+           function showNextChoices() {
+               $("#song-vote").empty();
+               for (var i = 0; i < 4; i++) {
+                   song = vote_songs.pop();
+                   $("#song-vote").append("<button class=\"song-button\" name=\"vote\" value=\"" + song[3] +"\" type=\"button\"> <img src=" + song[2] + " height=\"60\" width=\"60\"/>   " + song[0] + "</button>");
+               }
+           }
+
+           function submitVotes() {
+                $("#song-vote").empty();
+                $("#song-vote").append("<p style=\"color: red;\">Please wait for votes to be collected...</p>");
+               socket.emit("finish-voting", {"votes": votes, "username": username, "room_id": room_id});
+           }
         });
 	</script>
 
@@ -245,6 +265,7 @@
     <article>
         <h1 id="prompt" style="text-align:center; width:70%; display:none;">Please Select a Song</h1>
         <form id="song-vote" style="display:none"></form>
+        <ul id="vote-display" style="list-style-type:none;"></ul>
     </article>
 
     <aside>
