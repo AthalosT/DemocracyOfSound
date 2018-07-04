@@ -167,6 +167,7 @@
                 $("#song-vote").empty();
                 $("#song-vote").append("<p style=\"color: red;\">Please wait for votes to be collected...</p>");
                socket.emit("finish-voting", {"votes": votes, "username": username, "room_id": room_id});
+               votes = [];
            }
         });
 	</script>
