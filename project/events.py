@@ -1,9 +1,9 @@
-from project import socketio
+from project import socketio, db
 from flask import session
 from flask_socketio import send, emit, join_room, leave_room
-from project import db
 from project.lookup import lookup
 from project.models import User, Room, List, Song
+from project.voting import generate_random_survey
 import threading
 
 @socketio.on('join')
@@ -70,8 +70,9 @@ def handle_begin_voting(room_id):
     if room is not None:
         sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
         sug_list_songs = sug_list.list_songs()
+        survey_list = generate_random_survey(sug_list_songs)
         #send list somewhere else and get back
-        emit('display-vote-songs', sug_list_songs, room=room_id)
+        emit('display-vote-songs', survey_list, room=room_id)
 
 @socketio.on('finish-voting')
 def handle_finish_voting(data):
