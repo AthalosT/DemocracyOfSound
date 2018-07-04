@@ -154,7 +154,7 @@
                 if (current_votes == undefined) {
                     votes[selected_vote] = 1;
                 } else{
-                    votes[selected_vote] = current_votes;
+                    votes[selected_vote] = current_votes + 1;
                 }
 
                 if (vote_songs.length > 3) {
@@ -175,8 +175,13 @@
            function submitVotes() {
                 $("#song-vote").empty();
                 $("#song-vote").append("<p style=\"color: red;\">Please wait for votes to be collected...</p>");
-               socket.emit("finish-voting", {"votes": votes, "username": username, "room_id": room_id});
-               votes = [];
+                setTimeout(function() {
+                    $("#song-vote").empty();
+                    $("#song-vote").css("display", "none");
+                }, 1000);
+
+                socket.emit("finish-voting", {"votes": votes, "username": username, "room_id": room_id});
+                votes = [];
            }
         });
 	</script>
