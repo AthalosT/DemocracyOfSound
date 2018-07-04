@@ -42,7 +42,7 @@ class Room(db.Model):
     last_used = db.Column(db.DateTime, index=True, default=datetime.utcnow)
     authorized = db.relationship('User', secondary=auth_users, lazy='dynamic')
     current_users = db.relationship('User', secondary=room_users, lazy='dynamic')
-    
+
     def __repr__(self):
         return '<Room {}>'.format(self.room_id)
 
@@ -98,20 +98,35 @@ class Song(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     artist = db.Column(db.String(100))
+    album_cover = db.Column(db.String(200))
     spotify_url = db.Column(db.String(200))
 
     def __repr__(self):
         return '<Song {}>'.format(self.name)
 
+# Might want to completely clean up and reformat database
+class SongMeta(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    spotify_url = db.Column(db.String(200))
+    suggested_by = db.Column(db.String(64))
+    last_played = db.Column(db.Integer(), default=0)
+    num_votes = db.Column(db.Integer(), default=0)
+    list_id = db.Column(db.Integer, db.ForeignKey('list.id'))
+
+    def __repr__(self):
+        return '<Song {}>'.format(self.spotify_url)
+
 class List(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     list_id = db.Column(db.String(11))
     room = db.Column(db.Integer, db.ForeignKey('room.id'))
-    songs = db.relationship('Song', secondary=song_lists, lazy='dynamic')    
+    songs = db.relationship('Song', secondary=song_lists, lazy='dynamic')
+    song_metas = db.relationship('SongMeta', lazy='dynamic')
 
     def add_song(self, song):
         if not self.check_song(song):
             self.songs.append(song)
+            self.song_metas.append(SongMeta(spotify_url=song.spotify_url, list_id=self.id))
             return True
         else:
             return False
@@ -120,12 +135,27 @@ class List(db.Model):
         return self.songs.filter(
             song_lists.c.song_id == song.id).count() > 0
 
+    def vote_song(self, spotify_url, votes):
+        meta = self.song_metas.filter_by(spotify_url=spotify_url).first()
+        if meta is not None:
+            meta.num_votes = meta.num_votes + votes
+            return True
+        else:
+            return False
+
     def list_songs(self):
         #TODO naming
         ret = []
         for song in self.songs:
-           ret.append([song.name, song.artist, song.spotify_url])
-        return ret 
+           ret.append([song.name, song.artist, song.album_cover, song.spotify_url])
+        return ret
+
+    def list_votes(self):
+        ret = []
+        for song in self.songs:
+            meta = self.song_metas.filter_by(spotify_url=song.spotify_url).first()
+            ret.append([song.spotify_url, meta.num_votes])
+        return ret
     
     def __repr__(self):
         return '<List>' #TODO

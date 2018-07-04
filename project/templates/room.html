@@ -6,6 +6,8 @@
 			var socket = io.connect(location.protocol + '//' + document.domain + ':' + location.port);
 			var room_id = "{{ room.room_id }}";
 			var username = "{{ username }}";
+            var vote_songs;
+            var votes;
             
             socket.on("connect", function() {
                 socket.emit("join", {"room_id": room_id, "username": username});
@@ -53,11 +55,24 @@
                 }
 			});
 
-            socket.on("failed", function(str) {
+            socket.on("result-message", function(str) {
                 // Called if back-end failed to add song to room playlist.
                 // TODO message about failing to add to list
                 $("#results").append(str);
                 $("#results").css("display", "block");
+            });
+
+            socket.on("display-vote-songs", function(songs) {
+                vote_songs = songs;
+                votes = {};
+                $("#song-vote").empty()
+                for (var i = 0; i < 4; i++) {
+                    song = vote_songs.pop();
+                    console.log(song);
+                    $("#song-vote").append("<button class=\"song-button\" type=\"button\" value=\"" + song[3] +"\" type=\"submit\"> <img src=" + song[2] + " height=\"60\" width=\"60\" style=\"float:left;\"><div style=\"float:right\">" + song[0] + "</div></button>");
+                }
+                $("#song-vote").css("display", "block");
+                $("#prompt").css("display", "block");
             });
 
             $("#search-box").keypress(function(e) {
@@ -81,7 +96,6 @@
 
 			socket.on("chat-message", function(msg) {
 				$("#messages-list").append("<li>" + msg + "</li>");
-				console.log("Received message");
 			});
 
 			$("#search-button").on("click", function() {
@@ -91,18 +105,50 @@
 			});
             
             $("#submit").on("click", function() {
-                selected = document.forms.results.song.value
+                selected = document.forms.results.song.value;
                 if (selected != null) {
-                    var room_id = "{{ room.room_id }}";
                     socket.emit("song-selection", {"spotify_url": selected, 
                         "room_id": room_id});
                     $("#results").empty();
                     $("#results").css("display", "none");
                     $("#submit").css("display", "none");
-                    $("#search-box").val("")
+                    $("#search-box").val("");
                 }
             });
-		});
+
+            $("#begin-voting").on("click", function() {
+               socket.emit("begin-voting", room_id);
+               $("#begin-voting").css("display", "none");
+               $("#end-voting").css("display", "block");
+            });
+
+            $("#end-voting").on("click", function() {
+                socket.emit("end-voting", room_id);
+                $("#end-voting").css("display", "none");
+                $("#begin-voting").css("display", "block");
+            });
+
+            $(document).on("click", ".song-button", function(e) {
+                var selected_vote = $(this).attr('value');
+                current_votes = votes[selected_vote];
+                if (current_votes == undefined) {
+                    votes[selected_vote] = 1;
+                } else{
+                    votes[selected_vote] = current_votes;
+                }
+
+                if (vote_songs.length > 3) {
+                    $("#song-vote").empty()
+                    for (var i = 0; i < 4; i++) {
+                        song = vote_songs.pop();
+                        $("#song-vote").append("<button class=\"song-button\" name=\"vote\" value=\"" + song.spotify_url +"\" type=\"submit\"> <img src=" + song.album_cover + " height=\"60\" width=\"60\"/>   " + song.name + "</button>");
+                    }
+                } else{
+                    $("#song-vote").css("display", "none");
+                    socket.emit("finish-voting", {"votes": votes, "username": username, "room_id": room_id});
+                }
+           });
+        });
 	</script>
 
     <style>
@@ -129,6 +175,37 @@
         margin: auto;
         width: 25%;
     }
+
+    .song-button {
+        width: 40%;
+        height: 150px;
+        margin: 1%;
+        padding: 10px;
+        font-size: 20px;
+        border: solid #010101 1px;
+        background-color: #333333;
+        color: white;
+        text-align: left;
+        text-shadow: 2px 2px 5px black;
+        vertical-align: top;
+    }
+
+    .song-button:hover {
+        background-color: #4d4d4d;
+    }
+
+    .chat-box {
+        background-color: #101010;
+        text-align: left;
+        height: 220px;
+        width: 100%;
+        float: right;
+        border: solid #010101 1px;
+        color: white;
+        text-shadow: 1px 0px 2px black;
+        vertical-align: top;
+    }
+
     </style>
 
     <section>
@@ -161,11 +238,13 @@
         {% if is_owner %}
             <p></p>
             <button id="begin-voting">Begin Voting</button>
-            <button id="second-button">Second Button</button>
+            <button id="end-voting" style="display:none;">End Voting</button>
         {% endif %}
     </section>
 
     <article>
+        <h1 id="prompt" style="text-align:center; width:70%; display:none;">Please Select a Song</h1>
+        <form id="song-vote" style="display:none"></form>
     </article>
 
     <aside>
@@ -174,7 +253,7 @@
     </font>
 
     <p></p>
-	<div id="chat-box" style="background-color:lightblue; align:left; transparency:40%; height:220px; width:100%; float:right; border:1px solid black;">
+	<div id="chat-box" class="chat-box">
 		<ul id="messages-list" style="overflow-y:auto; height:200px; width:95%px; list-style-type:none; padding-left:5;"></ul>
 		<input id="message-box" style="align:center;" placeholder="Enter message">
 		<button id="send-message" style="align:center;">Send</button>
