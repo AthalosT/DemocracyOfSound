@@ -23,8 +23,6 @@
                 
                 for (var i = 0; i < current_users.length; i++) {
                     $("#room-users").append("<tr><td>" + current_users[i] + "</td></tr>");
-                    // Fix visual and spacing issues later.
-                    //$("#tabbing").append("<br>");
                 }
             });
 
@@ -83,14 +81,7 @@
                 $("#vote-display").css("display", "block");
             });
 
-            $("#search-box").keypress(function(e) {
-                var code = e.keyCode || e.which;
-                if (code == 13) {
-                    $("#search-button").click()
-                }
-            });
-
-			$("#message-box").keypress(function(e) {
+		    $("#message-box").keypress(function(e) {
 				var code = e.keyCode || e.which;
 				if (code == 13 && $("#message-box").val() !== "") {
 					$("#send-message").click();
@@ -106,6 +97,13 @@
 				$("#messages-list").append("<li>" + msg + "</li>");
 			});
 
+            $("#search-box").keypress(function(e) {
+                var code = e.keyCode || e.which;
+                if (code == 13) {
+                    $("#search-button").click()
+                }
+            });
+	
 			$("#search-button").on("click", function() {
 				if ($("#search-box").val() != "") {
                     socket.emit("song-query", {"query": $("#search-box").val(), "num_selections": $("#num-selections").val()});
