@@ -7,10 +7,8 @@ def generate_random_survey(sug_list_songs):
     choice_list = randomize_choices(num_choices, num_shown)
 
     ret = []
-
     for i in choice_list:
         ret.append(sug_list_songs[i])
-
     return ret
 
 def randomize_choices(num_choices, num_shown):
@@ -38,3 +36,4 @@ class ChoiceRepr():
 
     def __init__(self, id):
         self.id = id
+        self.times_used = 0
