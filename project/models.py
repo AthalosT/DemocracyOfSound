@@ -156,6 +156,10 @@ class List(db.Model):
             meta = self.song_metas.filter_by(spotify_url=song.spotify_url).first()
             ret.append([song.spotify_url, meta.num_votes])
         return ret
+
+    def reset_votes(self):
+        for meta in self.song_metas:
+            meta.num_votes = 0
     
     def __repr__(self):
         return '<List>' #TODO

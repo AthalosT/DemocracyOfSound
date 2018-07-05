@@ -33,7 +33,8 @@ def randomize_choices(num_choices, num_shown):
                 choice_list.append(choice.id)
                 poss_choices[choice.times_used].remove(choice)
                 choice.times_used += 1
-                poss_choices[choice.times_used].add(choice)
+                if (choice.times_used <= num_shown):
+                    poss_choices[choice.times_used].add(choice)
 
             current_layer += 1
         else:
@@ -43,7 +44,7 @@ def randomize_choices(num_choices, num_shown):
                 poss_choices[choice.times_used].remove(choice)
                 choice.times_used += 1
                 poss_choices[choice.times_used].add(choice)
-
+    
     return choice_list
 
 class ChoiceRepr():

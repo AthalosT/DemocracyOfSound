@@ -69,6 +69,8 @@ def handle_begin_voting(room_id):
     room = Room.query.filter_by(room_id=room_id).first()
     if room is not None:
         sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
+        sug_list.reset_votes()
+        db.session.commit()
         sug_list_songs = sug_list.list_songs()
         survey_list = generate_random_survey(sug_list_songs)
         #send list somewhere else and get back
