@@ -249,8 +249,8 @@
             <h1>Room {{ room.room_id }}</h1>
         {% endif %}
 
-        <h3 id="title" style="display:none"></h3>
-        <ol id="sug-list" style="display:none"></ol>
+        <h3 id="title" style="display:none;"></h3>
+        <ol id="sug-list" style="display:none; overflow-y:auto; height:150px; width:80%; border:solid #010101 1px;"></ol>
 
         <h3>Suggest a Song:</h3>
 	    <input type="text" id="search-box">
@@ -265,8 +265,8 @@
         </select>
 	    <button id="search-button">Search</button>
 
-        <form id="results" style="display:none"></form>
-	    <button id="submit" style="display:none">Submit</button>
+        <form id="results" style="display:none;"></form>
+	    <button id="submit" style="display:none;">Submit</button>
 
         {% if is_owner %}
             <p></p>
@@ -278,8 +278,9 @@
 
     <article>
         <h1 id="prompt" style="text-align:center; width:70%; display:none;">Please Select a Song</h1>
-        <form id="song-vote" style="display:none"></form>
+        <form id="song-vote" style="display:none;"></form>
         <ul id="vote-display" style="list-style-type:none;"></ul>
+        <iframe src="https://open.spotify.com/embed?uri=spotify:track:4pYd8dIohiqc3KsxSRqf0w" width="300" height="380" frameborder="0" allowtransparency="true" allow="encrypted-media"></iframe>
     </article>
 
     <aside>
