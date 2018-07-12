@@ -19,7 +19,7 @@ def suggested_list(input_str, num_args):
             artists.append(j['name'])
 
         temp = selection.Selection(name=t['name'], artists=artists, explicit=t['explicit'],
-                                   spotify_url=t['external_urls']['spotify'], 
+                                   spotify_url=t['external_urls']['spotify'], uri=t['external_urls']['uri'],
                                    preview_url=t['preview_url'], album_cover=t['album']['images'][0]['url'])
         suggestions.append(temp)
 
@@ -36,7 +36,7 @@ def get_track(input_str):
     for i in result['artists']:
         artists.append(i['name'])
     temp = selection.Selection(name=result['name'], artists=artists, explicit=result['explicit'],
-                                   spotify_url=result['external_urls']['spotify'], 
+                                   spotify_url=result['external_urls']['spotify'], uri=result['external_urls']['uri'],
                                    preview_url=result['preview_url'], album_cover=result['album']['images'][0]['url'])
     
     return temp

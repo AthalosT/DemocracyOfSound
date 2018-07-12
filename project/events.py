@@ -51,7 +51,7 @@ def handle_song_selection(selection_data):
         chosen = lookup.get_track(spotify_url)
         db_song = Song.query.filter_by(spotify_url=spotify_url).first()
         if db_song is None:
-            db_song = Song(name=chosen.name, artist=chosen.main_artist(), album_cover=chosen.album_cover, spotify_url=chosen.spotify_url)
+            db_song = Song(name=chosen.name, artist=chosen.main_artist(), album_cover=chosen.album_cover, spotify_url=chosen.spotify_url, uri=chosen.uri)
             db.session.add(db_song)
 
         sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
