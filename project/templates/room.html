@@ -97,6 +97,10 @@
 				$("#messages-list").append("<li>" + msg + "</li>");
 			});
 
+			socket.on("playlist-generation", function(uri) {
+				$("#playlist").html("<iframe src=\"https://open.spotify.com/embed?uri=" + uri + "\" width=\"300\" height=\"380\" frameborder=\"0\" allowtransparency=\"true\" allow=\"encrypted-media\"></iframe>)");
+			});
+
             $("#search-box").keypress(function(e) {
                 var code = e.keyCode || e.which;
                 if (code == 13) {
@@ -293,6 +297,9 @@
 		<ul id="messages-list" style="overflow-y:auto; height:200px; width:95%px; list-style-type:none; padding-left:5;"></ul>
 		<input id="message-box" style="align:center;" placeholder="Enter message">
 		<button id="send-message" style="align:center;">Send</button>
+	</div>
+
+	<div id="playlist">
 	</div>
     </aside>
 

@@ -1,6 +1,7 @@
 # Temporary spotipy client info
 
-client_id = "dd2f4ac919cc4f9fb8a4eb33c1b7f8e9"
-client_secret = "d38782fd61f7485eb026b4de8c161107"
+client_username = "4dl9x9nujqmns9whz2ulc8wro"
+client_id = "cc6fa23e1667477cbd0c8f43f4613457"
+client_secret = "ad57f20d4d6645e08618eb73667c76e9"
 client_redirect_url_localhost = "http://localhost:8888/callback"
-client_redirect_url_google = "http://google.com/"
+client_redirect_url_google = "https://google.com/"

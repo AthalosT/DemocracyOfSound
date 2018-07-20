@@ -1,4 +1,4 @@
-from project import socketio, db
+from project import socketio, db, spotify
 from flask import session
 from flask_socketio import send, emit, join_room, leave_room
 from project.lookup import lookup
@@ -113,3 +113,11 @@ def handle_chat_message(data, namespace='/chat'):
     room_id = data['room_id']
     username = data['username']
     emit('chat-message', username + ': ' + msg, room=room_id)
+
+@socketio.on('generate-playlist')
+def generate_playlist(data):
+    room_id = data['room_id']
+    playlist = spotify.create_playlist(room_id)
+    spotify.add_to_playlist(playlist.id, [songs for song in query_db_for_songs()]) # TODO
+    emit('playlist-generation', 'spotify:playlist:' + playlist.id, room=room_id)
+
