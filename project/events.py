@@ -102,10 +102,15 @@ def handle_end_voting(room_id):
         sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
         sug_list_votes = sug_list.list_votes()
         vote_display = []
-        for vote in sug_list_votes:
-            song = lookup.get_track(vote[0])
-            vote_display.append(song.name + " " + song.main_artist() + "\t" + str(vote[1]))
-        emit('display-votes', vote_display, room=room_id)
+
+        playlist = spotify.create_playlist(room_id)
+        sorted_list = list(sorted(sug_list_votes, key=lambda x: x[1], reverse=True))
+        spotify.add_to_playlist(playlist.id, [song[0] for song in sorted_list])
+        emit('playlist-generation', 'spotify:playlist:' + playlist.id, room=room_id)
+        #for vote in sug_list_votes:
+            #song = lookup.get_track(vote[0])
+            #vote_display.append(song.name + " " + song.main_artist() + "\t" + str(vote[1]))
+        #emit('display-votes', vote_display, room=room_id)
 
 @socketio.on('chat-message')
 def handle_chat_message(data, namespace='/chat'):
