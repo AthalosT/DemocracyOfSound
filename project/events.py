@@ -104,9 +104,9 @@ def handle_end_voting(room_id):
         vote_display = []
 
         playlist = spotify.create_playlist(room_id)
-        sorted_list = list(sorted(sug_list_votes, key=lambda x: x[1], reverse=True))
-        spotify.add_to_playlist(playlist.id, [song[0] for song in sorted_list])
-        emit('playlist-generation', 'spotify:playlist:' + playlist.id, room=room_id)
+        sorted_list = sorted(sug_list_votes, key=lambda x: x[1], reverse=True)
+        spotify.add_to_playlist(playlist['id'], [song[0] for song in sorted_list])
+        emit('playlist-generation', 'spotify:playlist:' + playlist['id'], room=room_id)
         #for vote in sug_list_votes:
             #song = lookup.get_track(vote[0])
             #vote_display.append(song.name + " " + song.main_artist() + "\t" + str(vote[1]))
