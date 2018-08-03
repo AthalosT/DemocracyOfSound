@@ -22,6 +22,10 @@ def updated_playlist(data):
         if sug_list_songs:
             emit('update-sug-list', [song for song in sug_list_songs])
 
+        playlist_id = room.playlist_id
+        if playlist_id != '':
+            emit('playlist-generation', 'spotify:playlist:' + playlist_id, room=room_id)
+
 @socketio.on('leave')
 def on_leave(data):
     room_id = data['room_id']
@@ -99,14 +103,22 @@ def handle_end_voting(room_id):
     room = Room.query.filter_by(room_id=room_id).first()
     
     if room is not None:
+        playlist_id = room.playlist_id
+
         sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
         sug_list_votes = sug_list.list_votes()
         vote_display = []
-
-        playlist = spotify.create_playlist(room_id)
         sorted_list = sorted(sug_list_votes, key=lambda x: x[1], reverse=True)
-        spotify.add_to_playlist(playlist['id'], [song[0] for song in sorted_list])
-        emit('playlist-generation', 'spotify:playlist:' + playlist['id'], room=room_id)
+        
+        if playlist_id == '':
+            playlist = spotify.create_playlist(room_id)
+            playlist_id = playlist['id']
+            room.playlist_id = playlist_id
+            db.session.commit()
+        
+        spotify.reset_and_add_to_playlist(playlist_id, [song[0] for song in sorted_list])
+        emit('playlist-generation', 'spotify:playlist:' + playlist_id, room=room_id)
+
         #for vote in sug_list_votes:
             #song = lookup.get_track(vote[0])
             #vote_display.append(song.name + " " + song.main_artist() + "\t" + str(vote[1]))
@@ -118,11 +130,3 @@ def handle_chat_message(data, namespace='/chat'):
     room_id = data['room_id']
     username = data['username']
     emit('chat-message', username + ': ' + msg, room=room_id)
-
-@socketio.on('generate-playlist')
-def generate_playlist(data):
-    room_id = data['room_id']
-    playlist = spotify.create_playlist(room_id)
-    spotify.add_to_playlist(playlist.id, [songs for song in query_db_for_songs()]) # TODO
-    emit('playlist-generation', 'spotify:playlist:' + playlist.id, room=room_id)
-

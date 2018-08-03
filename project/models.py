@@ -36,6 +36,7 @@ class Room(db.Model):
     room_id = db.Column(db.String(10), index=True, unique=True)
     suggest_list_id = db.Column(db.String(11))
     gen_list_id = db.Column(db.String(11))
+    playlist_id = db.Column(db.String(30), default='')
     owner_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     password_required = db.Column(db.Boolean(), default=True)
     password_hash = db.Column(db.String(128))
