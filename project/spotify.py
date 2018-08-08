@@ -1,4 +1,5 @@
 import spotipy
+import spotipy.oauth2 as oauth2
 from spotipy.oauth2 import SpotifyClientCredentials
 from project.lookup import cred
 from flask import redirect
@@ -20,9 +21,9 @@ def login_to_user_spotify():
     #Need to more access to user data? Add more scopes here!
     SCOPE = 'playlist-read-private user-library-read playlist-modify-public playlist-modify-private'
     CACHE = '.spotipyoauthcache'
-    SPOTIPY_REDIRECT_URI = redirect(url_for('index'))
+    SPOTIPY_REDIRECT_URI = "127.0.0.1"
     #TODO determine where to redirect after authorization by putting URI in SPOTIPY_REDIRECT_URI
     sp_oauth = oauth2.SpotifyOAuth(cred.client_id, cred.client_secret,SPOTIPY_REDIRECT_URI,scope=SCOPE,cache_path=CACHE)
-    
+    return sp_oauth 
     print(sp_oauth.get_cached_token())
-    print(sp_oauth.is_token_expired())
+    #print(sp_oauth.is_token_expired())
