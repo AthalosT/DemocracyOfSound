@@ -9,6 +9,7 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), index=True, unique=True)
     password_hash = db.Column(db.String(128))
+    auth_token = db.Column(db.String(30))
     invisible = db.Column(db.Boolean, default=False)
    
     def __repr__(self):
@@ -19,6 +20,9 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def set_token(self, token):
+        self.auth_token = token
 
 auth_users = db.Table('auth_users', 
     db.Column('room_id', db.Integer, db.ForeignKey('room.id')),
