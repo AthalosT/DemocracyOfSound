@@ -1,11 +1,12 @@
 from flask import render_template, flash, redirect, url_for, request
 from project import app, db
+from project.spotify import get_auth_object
 from project.forms import LoginForm, RegistrationForm, PostForm, RoomLoginForm, CreateRoomForm, FindRoomForm, SongQueryForm, SongSelectForm
 from flask_login import current_user, login_user, logout_user, login_required
+from project.lookup import lookup
 from project.models import User, Song, Room, List
 from werkzeug.urls import url_parse
 from datetime import datetime
-from project.lookup import lookup
 import spotipy
 import random
 import string
@@ -98,12 +99,14 @@ def room(room_id):
     if room is None:
         return redirect(url_for('create_room'))
     elif not room.check_user(current_user) and room.password_required:
-         return redirect(url_for('room_login', room_id=room_id))
+        return redirect(url_for('room_login', room_id=room_id))
 
     suggest_list = List.query.filter_by(list_id=room.suggest_list_id).first().list_songs()
     gen_list = List.query.filter_by(list_id=room.gen_list_id).first().list_songs()
+    sp_oauth = get_auth_object()
+    auth_link = sp_oauth.get_authorize_url()
 
-    return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list, username=current_user.username, is_owner=room.check_owner(current_user)) 
+    return render_template('room.html', room=room, suggest_list=suggest_list, gen_list=gen_list, username=current_user.username, is_owner=room.check_owner(current_user), auth_link=auth_link) 
 
 @app.route('/roomlogin/<room_id>', methods=['GET', 'POST'])
 def room_login(room_id):
@@ -209,3 +212,14 @@ def check_authenticated(room_id):
     elif not room.check_user(current_user):
         return (True, redirect(url_for('room_login', room_id=room_id)))
     return (False, room)
+
+@app.route('/auth/', methods=['GET'])
+def store_auth():
+    if not current_user.is_authenticated:
+        return (True, redirect(url_for('login')))
+
+    auth_token = request.args.get('code', None)
+    if auth_token:
+        current_user.set_token(auth_token)
+        db.session.commit()
+    return render_template('auth.html', auth_token=auth_token) 

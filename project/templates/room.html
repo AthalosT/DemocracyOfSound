@@ -150,6 +150,12 @@
                 }, 500);
             });
 
+            $("#spotify_auth").on("click", function() {
+                    var auth_link = document.getElementById("spotify_auth").value;
+                    var win = window.open(auth_link);
+                    isetTimeout(function () { win.close();}, 3000);
+            });
+
             $(document).on("click", ".song-button", function(e) {
                 var selected_vote = $(this).attr('value');
                 current_votes = votes[selected_vote];
@@ -281,6 +287,10 @@
     </section>
 
     <article>
+        {% if auth_link %}
+            <button id="spotify_auth" value={{auth_link}}>Login to Spotify</button>
+        {% endif %}
+
         <h1 id="prompt" style="text-align:center; width:70%; display:none;">Please Select a Song</h1>
         <form id="song-vote" style="display:none;"></form>
         <ul id="vote-display" style="list-style-type:none;"></ul>
