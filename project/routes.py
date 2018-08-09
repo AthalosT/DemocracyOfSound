@@ -222,9 +222,14 @@ def store_auth():
     
     #after getting token info 
     #better to store token info than auth_token but I don't want to mess with your db
+    sp_oauth = get_auth_object()
     token_info = sp_oauth.get_access_token(auth_token)
     
     if auth_token:
-        current_user.set_token(auth_token)
+
+        access_token = token_info['access_token']
+        refresh_token = token_info['refresh_token']
+        current_user.set_access_token(access_token)
+        current_user.set_refresh_token(refresh_token)
         db.session.commit()
-    return render_template('auth.html', auth_token=auth_token) 
+    return render_template('auth.html', auth_token=auth_token, token_info=token_info, access_token=access_token) 

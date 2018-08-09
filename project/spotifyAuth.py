@@ -1,5 +1,6 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+import spotipy.oauth2 as oauth2
 from project.lookup import cred
 from flask import redirect
 
