@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
 from project import app, db
-from project.spotify import get_auth_object
+from project.spotifyAuth import get_auth_object, get_access_token, refresh_token
 from project.forms import LoginForm, RegistrationForm, PostForm, RoomLoginForm, CreateRoomForm, FindRoomForm, SongQueryForm, SongSelectForm
 from flask_login import current_user, login_user, logout_user, login_required
 from project.lookup import lookup
@@ -219,6 +219,11 @@ def store_auth():
         return (True, redirect(url_for('login')))
 
     auth_token = request.args.get('code', None)
+    
+    #after getting token info 
+    #better to store token info than auth_token but I don't want to mess with your db
+    token_info = sp_oauth.get_access_token(auth_token)
+    
     if auth_token:
         current_user.set_token(auth_token)
         db.session.commit()
