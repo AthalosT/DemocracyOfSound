@@ -158,62 +158,6 @@ def find_song(room_id):
     
     return render_template('suggest.html', find_song_form=find_song_form, show=show)
 
-'''
-@app.route('/suggest/<room_id>/q=<query>', methods=['GET', 'POST'])
-def select_song(room_id, query):
-    not_authenticated, ret = check_authenticated(room_id)
-    if not_authenticated:
-        return ret
-    room = ret
-
-    find_song_form = SongQueryForm()
-    select_song_form = SongSelectForm()
-    select_song_form.choices.choices = []
-
-    suggestions = lookup.suggested_list(query, 5)
-    select_song_form.choices.choices = []
-    album_covers = []
-
-    #TODO right now the site makes a second call to spotipy in order to ensure validation
-    #     maybe it would be better to store all suggestions and repopulate list using stored 
-    #     suggestions in the database. Otherwise make sure to fix this when adding js
-    for i in range(0, len(suggestions)):
-        suggestion = suggestions[i]
-        select_song_form.choices.choices.append((suggestion.spotify_url, "\"" + suggestion.name + "\" by " + suggestion.main_artist()))
-        album_covers.append(suggestion.album_cover)
-
-    if find_song_form.submit1.data and find_song_form.validate():
-        return redirect(url_for('select_song', room_id=room_id, query=find_song_form.user_query.data))
-    elif select_song_form.submit2.data and select_song_form.validate():
-        #TODO better names
-        chosen = lookup.get_track(select_song_form.choices.data)
-    
-        db_song = Song.query.filter_by(spotify_url=chosen.spotify_url).first()
-        if db_song is None:
-            db_song = Song(name=chosen.name, artist=chosen.main_artist(), album_cover=chosen.album_cover, spotify_url=chosen.spotify_url, uri=chosen.uri)
-            db.session.add(db_song)
-
-        sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
-        sug_list.add_song(db_song)
-        db.session.commit()
-        
-        flash("Song " + db_song.name + " added.")
-        return redirect(url_for('room', room_id=room_id))
- 
-    return render_template('suggest.html', find_song_form=find_song_form, select_song_form=select_song_form, show=True, album_covers=album_covers)
-
-def check_authenticated(room_id):
-    #TODO standardize authentication methods
-    if not current_user.is_authenticated:
-        return (True, redirect(url_for('login')))
-    room = Room.query.filter_by(room_id=room_id).first()
-    if room is None:
-        return (True, redirect(url_for('create_room')))
-    elif not room.check_user(current_user):
-        return (True, redirect(url_for('room_login', room_id=room_id)))
-    return (False, room)
-'''
-
 @app.route('/auth/', methods=['GET'])
 def store_auth():
     if not current_user.is_authenticated:
