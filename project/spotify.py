@@ -9,8 +9,8 @@ def create_playlist(name, auth_token):
 
 def add_to_playlist(playlist_id, songs, auth_token):
     sp = spotipy.Spotify(auth=auth_token)
-    sp.user_playlist_add_tracks(sp.current_user(), playlist_id, songs)
+    sp.user_playlist_add_tracks(sp.current_user()['id'], playlist_id, songs)
 
 def reset_and_add_to_playlist(playlist_id, songs, auth_token):
     sp = spotipy.Spotify(auth=auth_token)
-    sp.user_playlist_replace_tracks(sp.current_user(), playlist_id, songs)
+    sp.user_playlist_replace_tracks(sp.current_user()['id'], playlist_id, songs)
