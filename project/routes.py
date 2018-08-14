@@ -217,7 +217,7 @@ def check_authenticated(room_id):
 @app.route('/auth/', methods=['GET'])
 def store_auth():
     if not current_user.is_authenticated:
-        return (True, redirect(url_for('login')))
+        return redirect(url_for('login'))
 
     auth_token = request.args.get('code', None)
     
