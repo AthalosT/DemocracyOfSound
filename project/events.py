@@ -16,10 +16,11 @@ def updated_playlist(data):
         join_room(room_id)
         user = User.query.filter_by(username=username).first()
         room.add_current_user(user)
+        
         if user.access_token == '':
             emit('prompt-auth-spotify')
-        emit('prompt-auth-spotify')
-        print('prompted')
+        else:
+            emit('close-auth-spotify')
         db.session.commit()
         emit('update-room-users', room.list_current_users(), room=room_id)
 
@@ -109,6 +110,7 @@ def handle_end_voting(data):
     room_id = data['room_id']
     username = data['username']
     room = Room.query.filter_by(room_id=room_id).first()
+    user = User.query.filter_by(username=username).first()
     
     if room is not None:
         playlist_id = room.playlist_id
@@ -119,14 +121,13 @@ def handle_end_voting(data):
         sorted_list = sorted(sug_list_votes, key=lambda x: x[1], reverse=True)
         
         if playlist_id == '':
-            playlist = spotify.create_playlist(room_id)
+            playlist = spotify.create_playlist(room_id, user.access_token)
             playlist_id = playlist['id']
             room.playlist_id = playlist_id
             db.session.commit()
        
         #TODO add a check for whether user has authenticated and if not then don't end the voting process and instead prompt the user to log in.
-        user = User.query.filter_by(username=username).first()
-        spotify.reset_and_add_to_playlist(playlist_id, [song[0] for song in sorted_list], user.get_access_token())
+        spotify.reset_and_add_to_playlist(playlist_id, [song[0] for song in sorted_list], user.access_token)
         emit('playlist-generation', 'spotify:playlist:' + playlist_id, room=room_id)
 
         #for vote in sug_list_votes:

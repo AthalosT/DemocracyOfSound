@@ -85,6 +85,10 @@
                 $("#spotify-auth").click();
             });
 
+            socket.on("close-auth-spotify", function() {
+                $("#spotify-auth").css("display", "none");
+            });
+
 		    $("#message-box").keypress(function(e) {
 				var code = e.keyCode || e.which;
 				if (code == 13 && $("#message-box").val() !== "") {
@@ -158,6 +162,7 @@
                     var auth_link = document.getElementById("spotify-auth").value;
                     var win = window.open(auth_link);
                     //isetTimeout(function () { win.close();}, 3000);
+                    $("#spotify-auth").css("display", "none");
             });
 
             $(document).on("click", ".song-button", function(e) {

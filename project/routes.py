@@ -79,7 +79,6 @@ def create_room():
         db.session.add(gen_list)
         db.session.commit()
 
-        flash('Room ' + room_id + ' successfully created.')
         return redirect(url_for('room', room_id=room_id))
     else:
         form.room_name.data = current_user.username + "'s Room"
