@@ -81,6 +81,10 @@
                 $("#vote-display").css("display", "block");
             });
 
+            socket.on("prompt-auth-spotify", function() {
+                $("#spotify-auth").click();
+            });
+
 		    $("#message-box").keypress(function(e) {
 				var code = e.keyCode || e.which;
 				if (code == 13 && $("#message-box").val() !== "") {
@@ -146,14 +150,14 @@
                 $("#end-voting").css("display", "none");
                 $("#begin-voting").css("display", "block");
                 setTimeout(function() {
-                    socket.emit("end-voting", room_id);
+                    socket.emit("end-voting", {"room_id": room_id, "username": username});
                 }, 500);
             });
 
-            $("#spotify_auth").on("click", function() {
-                    var auth_link = document.getElementById("spotify_auth").value;
+            $("#spotify-auth").on("click", function() {
+                    var auth_link = document.getElementById("spotify-auth").value;
                     var win = window.open(auth_link);
-                    isetTimeout(function () { win.close();}, 3000);
+                    //isetTimeout(function () { win.close();}, 3000);
             });
 
             $(document).on("click", ".song-button", function(e) {
@@ -288,7 +292,7 @@
 
     <article>
         {% if auth_link %}
-            <button id="spotify_auth" value={{auth_link}}>Login to Spotify</button>
+            <button id="spotify-auth" value={{auth_link}}>Login to Spotify</button>
         {% endif %}
 
         <h1 id="prompt" style="text-align:center; width:70%; display:none;">Please Select a Song</h1>

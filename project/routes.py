@@ -159,6 +159,7 @@ def find_song(room_id):
     
     return render_template('suggest.html', find_song_form=find_song_form, show=show)
 
+'''
 @app.route('/suggest/<room_id>/q=<query>', methods=['GET', 'POST'])
 def select_song(room_id, query):
     not_authenticated, ret = check_authenticated(room_id)
@@ -212,6 +213,7 @@ def check_authenticated(room_id):
     elif not room.check_user(current_user):
         return (True, redirect(url_for('room_login', room_id=room_id)))
     return (False, room)
+'''
 
 @app.route('/auth/', methods=['GET'])
 def store_auth():
