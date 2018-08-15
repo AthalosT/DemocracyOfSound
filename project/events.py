@@ -77,7 +77,7 @@ def handle_song_selection(selection_data):
 @socketio.on('begin-voting')
 def handle_begin_voting(room_id):
     room = Room.query.filter_by(room_id=room_id).first()
-    if room is not None:
+    if room:
         suggestions = List.query.filter_by(list_id=room.suggest_list_id).first()
         suggestions.reset_votes()
         db.session.commit()
@@ -93,7 +93,7 @@ def handle_finish_voting(data):
     votes = data['votes']
     
     room = Room.query.filter_by(room_id=room_id).first()
-    if room is not None:
+    if room:
         suggestions = List.query.filter_by(list_id=room.suggest_list_id).first()
         for key in votes:
             num_vote = votes[key]
