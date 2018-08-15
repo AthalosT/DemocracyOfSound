@@ -142,6 +142,8 @@ def find_room():
             return redirect(url_for('find_room'))
         elif current_room.password_required:
             return redirect(url_for('room_login', room_id=form.room_id.data))
+        else:
+            return redirect(url_for('room', room_id=form.room_id.data))
     return render_template('find-room.html', title='Find Room', form=form)
 
 @app.route('/suggest/<room_id>', methods=['GET', 'POST'])
