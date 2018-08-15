@@ -1,6 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request
 from project import app, db
-from project.spotifyAuth import get_auth_object, get_access_token, refresh_token
+from project.spotifyAuth import get_auth_object, refresh_access_token
 from project.forms import LoginForm, RegistrationForm, PostForm, RoomLoginForm, CreateRoomForm, FindRoomForm, SongQueryForm, SongSelectForm
 from flask_login import current_user, login_user, logout_user, login_required
 from project.lookup import lookup

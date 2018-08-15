@@ -41,24 +41,9 @@ def get_auth_object():
     #TODO determine where to redirect after authorization by putting URI in SPOTIPY_REDIRECT_URI
     sp_oauth = oauth2.SpotifyOAuth(cred.client_id, cred.client_secret,SPOTIPY_REDIRECT_URI,scope=SCOPE,cache_path=CACHE)
 
-    #print(sp_oauth.get_cached_token())
-    #print(sp_oauth.is_token_expired())
-
     return sp_oauth
 
-def get_access_token():
-    #include query for token_info not sure I did it correctly
-    conn = db.get_bind()
-    res = res = conn.execute("user, auth_token")
-    results = res.fetchall()
-    #some way to extract token info from results
-    return token_info.access_token
-
-def refresh_token():
-    #include query for token_info
-    conn = db.get_bind()
-    res = res = conn.execute("user, auth_token")
-    results = res.fetchall()
-    #some way to extract token info from results
-    new_token_info = sp_oauth.refresh_access_token(token_info.refresh_token)
-    #maybe save new token info to db
+def refresh_access_token(refresh_token):
+    sp_oauth = get_auth_object()
+    token_info = sp_oauth.refresh_access_token(refresh_token)
+    return token_info['access_token']

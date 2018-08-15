@@ -4,6 +4,7 @@ from flask_socketio import send, emit, join_room, leave_room
 from project.lookup import lookup
 from project.models import User, Room, List, Song
 from project.voting import generate_random_survey
+from project.spotifyAuth import refresh_access_token
 import threading
 
 @socketio.on('join')
@@ -20,6 +21,8 @@ def updated_playlist(data):
         if not user.access_token:
             emit('prompt-auth-spotify')
         else:
+            access_token = refresh_access_token(user.refresh_token)
+            user.set_access_token(access_token)
             emit('close-auth-spotify')
         db.session.commit()
         emit('update-room-users', room.list_current_users(), room=room_id)
