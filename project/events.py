@@ -12,25 +12,24 @@ def updated_playlist(data):
     username = data['username']
     room = Room.query.filter_by(room_id=room_id).first()
 
-    if room is not None:
+    if room:
         join_room(room_id)
         user = User.query.filter_by(username=username).first()
         room.add_current_user(user)
         
-        if user.access_token == '':
+        if not user.access_token:
             emit('prompt-auth-spotify')
         else:
             emit('close-auth-spotify')
         db.session.commit()
         emit('update-room-users', room.list_current_users(), room=room_id)
 
-        sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
-        sug_list_songs = sug_list.list_songs()
-        if sug_list_songs:
-            emit('update-sug-list', [song for song in sug_list_songs])
+        suggested_songs = List.query.filter_by(list_id=room.suggest_list_id).first().list_songs()
+        if suggested_songs:
+            emit('update-sug-list', suggested_songs)
 
         playlist_id = room.playlist_id
-        if playlist_id != '':
+        if playlist_id:
             emit('playlist-generation', 'spotify:playlist:' + playlist_id, room=room_id)
 
 @socketio.on('leave')
@@ -39,7 +38,7 @@ def on_leave(data):
     username = data['username']
     room = Room.query.filter_by(room_id=room_id).first()
 
-    if room is not None:
+    if room:
         leave_room(room_id)
         user = User.query.filter_by(username=username).first()
         room.remove_current_user(user)
@@ -58,20 +57,20 @@ def handle_song_selection(selection_data):
     spotify_url = selection_data['spotify_url']
     room_id = selection_data['room_id']
     room = Room.query.filter_by(room_id=room_id).first()
-    if room is not None:
+    if room:
         chosen = lookup.get_track(spotify_url)
         db_song = Song.query.filter_by(spotify_url=spotify_url).first()
-        if db_song is None:
+        if not db_song:
             db_song = Song(name=chosen.name, artist=chosen.main_artist(), album_cover=chosen.album_cover, spotify_url=chosen.spotify_url, uri=chosen.uri)
             db.session.add(db_song)
 
-        sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
-        if not sug_list.add_song(db_song):
+        suggestions = List.query.filter_by(list_id=room.suggest_list_id).first()
+        if not suggestions.add_song(db_song):
             emit('result-message', "The song has already been added to the playlist.")
         else:
             db.session.commit()
-            sug_list_songs = sug_list.list_songs()
-            emit('update-sug-list', [song for song in sug_list_songs], room=room_id)
+            suggested_songs = suggestions.list_songs()
+            emit('update-sug-list', suggested_songs, room=room_id)
     else:
         emit('result-message', "Sorry, the song was not added. Please try again.")
 
@@ -79,11 +78,11 @@ def handle_song_selection(selection_data):
 def handle_begin_voting(room_id):
     room = Room.query.filter_by(room_id=room_id).first()
     if room is not None:
-        sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
-        sug_list.reset_votes()
+        suggestions = List.query.filter_by(list_id=room.suggest_list_id).first()
+        suggestions.reset_votes()
         db.session.commit()
-        sug_list_songs = sug_list.list_songs()
-        survey_list = generate_random_survey(sug_list_songs)
+        suggested_songs = suggestions.list_songs()
+        survey_list = generate_random_survey(suggested_songs)
         #send list somewhere else and get back
         emit('display-vote-songs', survey_list, room=room_id)
 
@@ -95,10 +94,10 @@ def handle_finish_voting(data):
     
     room = Room.query.filter_by(room_id=room_id).first()
     if room is not None:
-        sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
+        suggestions = List.query.filter_by(list_id=room.suggest_list_id).first()
         for key in votes:
             num_vote = votes[key]
-            vote = sug_list.vote_song(spotify_url=key, votes=num_vote)
+            vote = suggestions.vote_song(spotify_url=key, votes=num_vote)
             db.session.commit()
 
 @socketio.on('collect-votes')
@@ -112,25 +111,23 @@ def handle_end_voting(data):
     room = Room.query.filter_by(room_id=room_id).first()
     user = User.query.filter_by(username=username).first()
     
-    if room is not None:
+    if room:
         playlist_id = room.playlist_id
 
-        sug_list = List.query.filter_by(list_id=room.suggest_list_id).first()
-        sug_list_votes = sug_list.list_votes()
+        suggestions = [song[0] for song in sorted(List.query.filter_by(list_id=room.suggest_list_id).first().list_votes(), key=lambda x: x[1], reverse=True)]
         vote_display = []
-        sorted_list = sorted(sug_list_votes, key=lambda x: x[1], reverse=True)
         
-        if playlist_id == '':
+        if not playlist_id:
             playlist = spotify.create_playlist(room_id, user.access_token)
             playlist_id = playlist['id']
             room.playlist_id = playlist_id
             db.session.commit()
        
         #TODO add a check for whether user has authenticated and if not then don't end the voting process and instead prompt the user to log in.
-        spotify.reset_and_add_to_playlist(playlist_id, [song[0] for song in sorted_list], user.access_token)
+        spotify.reset_and_add_to_playlist(playlist_id, suggestions, user.access_token)
         emit('playlist-generation', 'spotify:playlist:' + playlist_id, room=room_id)
 
-        #for vote in sug_list_votes:
+        #for vote in suggestions_votes:
             #song = lookup.get_track(vote[0])
             #vote_display.append(song.name + " " + song.main_artist() + "\t" + str(vote[1]))
         #emit('display-votes', vote_display, room=room_id)
