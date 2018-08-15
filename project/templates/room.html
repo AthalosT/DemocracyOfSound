@@ -42,7 +42,7 @@
                 $("#results").append("<br>");
                 if (results.length > 0) {
 				    for (var i = 0; i < results.length; i++) {
-                        $("#results").append("<input type=\"radio\" name=\"song\" value=\"" + results[i].spotify_url + "\">" + "<img src=" + results[i].album_cover + " height=\"40\" width=\"40\"/>" + results[i].name + "<br>");
+                        $("#results").append("<label><input type=\"radio\" name=\"song\" value=\"" + results[i].spotify_url + "\"><img src=" + results[i].album_cover + " height=\"40\" width=\"40\"/> " + results[i].name + "</label><br>");
 				    }
 				    $("#results").css("display", "block");
                     $("#submit").css("display", "inline");
@@ -82,6 +82,7 @@
             });
 
             socket.on("prompt-auth-spotify", function() {
+                $("#spotify-auth").css("display", "block");
                 $("#spotify-auth").click();
             });
 
@@ -161,7 +162,6 @@
             $("#spotify-auth").on("click", function() {
                     var auth_link = document.getElementById("spotify-auth").value;
                     var win = window.open(auth_link);
-                    //isetTimeout(function () { win.close();}, 3000);
                     $("#spotify-auth").css("display", "none");
             });
 
@@ -204,6 +204,7 @@
 	</script>
 
     <style>
+
     table {
         align: right;
         border-collapse: collapse;
@@ -214,6 +215,7 @@
         float: left;
         margin: auto;
         width: 25%;
+        height: 100%;
     }
 
     article {
@@ -282,13 +284,14 @@
                 {% endif %}
             {% endfor %}
         </select>
+
+        <p></p>
 	    <button id="search-button">Search</button>
 
         <form id="results" style="display:none;"></form>
 	    <button id="submit" style="display:none;">Submit</button>
 
         {% if is_owner %}
-            <p></p>
             <button id="begin-voting">Begin Voting</button>
             <button id="end-voting" style="display:none;">End Voting</button>
             <p id="owner-message" style="display:none; color:red;"></p>
@@ -297,7 +300,7 @@
 
     <article>
         {% if auth_link %}
-            <button id="spotify-auth" value={{auth_link}}>Login to Spotify</button>
+            <button id="spotify-auth" value={{auth_link}} style="display:none;">Login to Spotify</button>
         {% endif %}
 
         <h1 id="prompt" style="text-align:center; width:70%; display:none;">Please Select a Song</h1>
@@ -308,7 +311,7 @@
 
     <aside>
     <font size="18">
-        <table id="room-users" style="width:70%;" border="1"></table>
+        <table id="room-users" style="width:70%; border-color:#cdcdcd;" border="1"></table>
     </font>
 
     <p></p>
