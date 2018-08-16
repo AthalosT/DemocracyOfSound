@@ -130,11 +130,6 @@ def handle_end_voting(data):
         spotify.reset_and_add_to_playlist(playlist_id, suggestions, user.access_token)
         emit('playlist-generation', 'spotify:playlist:' + playlist_id, room=room_id)
 
-        #for vote in suggestions_votes:
-            #song = lookup.get_track(vote[0])
-            #vote_display.append(song.name + " " + song.main_artist() + "\t" + str(vote[1]))
-        #emit('display-votes', vote_display, room=room_id)
-
 @socketio.on('chat-message')
 def handle_chat_message(data, namespace='/chat'):
     msg = data['msg']

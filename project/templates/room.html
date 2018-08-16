@@ -103,7 +103,17 @@
 			});
 
 			socket.on("chat-message", function(msg) {
+                var mlist = document.getElementById("messages-list");
+                var scroll = false;
+                if (mlist.scrollHeight - mlist.scrollTop < 205) {
+                    scroll = true;
+                }
+
 				$("#messages-list").append("<li>" + msg + "</li>");
+
+                if (scroll) {
+                    mlist.scrollTop = mlist.scrollHeight - 200;
+                }
 			});
 
 			socket.on("playlist-generation", function(uri) {
@@ -190,6 +200,7 @@
            }
 
            function submitVotes() {
+                $("#prompt").css("display", "none");
                 $("#song-vote").empty();
                 $("#song-vote").append("<p style=\"color: red;\">Please wait for votes to be collected...</p>");
                 setTimeout(function() {
@@ -249,29 +260,21 @@
     }
 
     .chat-box {
-        background-color: #101010;
+        background-color: #121212;
         text-align: left;
         height: 220px;
         width: 100%;
         float: right;
-        border: solid #010101 1px;
-        color: white;
-        text-shadow: 1px 0px 2px black;
+        border: solid #676767 1px;
+        color: #bcbcbc;
         vertical-align: top;
     }
 
     </style>
 
     <section>
-        {% if room.room_name %}
-            <h1>{{ room.room_name }}<br> </h1>
-            <p>Room code: {{ room.room_id }}</p>
-        {% else %}
-            <h1>Room {{ room.room_id }}</h1>
-        {% endif %}
-
         <h3 id="title" style="display:none;"></h3>
-        <ol id="sug-list" style="display:none; overflow-y:auto; height:150px; width:80%; border:solid #010101 1px;"></ol>
+        <ol id="sug-list" style="display:none; overflow-y:auto; height:150px; width:80%; border:solid #565656 1px;"></ol>
 
         <h3>Suggest a Song:</h3>
 	    <input type="text" id="search-box">
@@ -284,10 +287,10 @@
                 {% endif %}
             {% endfor %}
         </select>
-
-        <p></p>
+        
 	    <button id="search-button">Search</button>
 
+        <p></p>
         <form id="results" style="display:none;"></form>
 	    <button id="submit" style="display:none;">Submit</button>
 
@@ -299,6 +302,13 @@
     </section>
 
     <article>
+         {% if room.room_name %}
+            <h1>{{ room.room_name }}<br> </h1>
+            <p>Room code: {{ room.room_id }}</p>
+        {% else %}
+            <h1>Room {{ room.room_id }}</h1>
+        {% endif %}
+
         {% if auth_link %}
             <button id="spotify-auth" value={{auth_link}} style="display:none;">Login to Spotify</button>
         {% endif %}
@@ -307,11 +317,12 @@
         <form id="song-vote" style="display:none;"></form>
         <ul id="vote-display" style="list-style-type:none;"></ul>
         <div id="playlist"></div>
+        <div id="display"></div>
     </article>
 
     <aside>
     <font size="18">
-        <table id="room-users" style="width:70%; border-color:#cdcdcd;" border="1"></table>
+        <table id="room-users" style="width:70%; border-color:#676767;" border="1"></table>
     </font>
 
     <p></p>
